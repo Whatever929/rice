@@ -4,6 +4,7 @@ from .jsonencoder import JSON_Encoder
 from .multiencoder import MultiEncoder
 from .questionnaire import Questionnaire
 from .scoring import Scoring
+from .generate_json_encoding import generate_json_encoding
 
 __all__ = [
     "Description",
@@ -11,5 +12,6 @@ __all__ = [
     "JSON_Encoder",
     "MultiEncoder",
     "Questionnaire",
-    "Scoring"
+    "Scoring",
+    "generate_json_encoding"
 ]
