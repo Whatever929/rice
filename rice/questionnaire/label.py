@@ -1,3 +1,6 @@
+import pandas as pd
+from ..util import generate_name
+
 class Label(object):
   name_generator = generate_name("label")
 

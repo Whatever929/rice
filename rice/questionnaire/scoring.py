@@ -3,8 +3,8 @@ from ..util import generate_name
 
 class Scoring(object):
     name_generator = generate_name("scoring")
-    def __init__(self, encoding, labeling, *, name=None):
-        """Encoding must a mapping of encoding object and corresponding column.
+    def __init__(self, encoding=None, labeling=None, *, name=None):
+        """Encoding must be a mapping of encoding object and corresponding column or a MultiEncoder.
         Might support array of SingleEncoder in the future.
 
         Can support multiple labeling, this is because for data with unknown labeling or no labeling,
@@ -34,18 +34,22 @@ class Scoring(object):
                 df[columns] = encoder.transform(df[columns])
         
         elif isinstance(self.encoding, MultiEncoder):
-            df = self.encoding.transform(df, **kwargs)
+            if 'return_rule' in kwargs and kwargs['return_rule']:
+                df, rule = self.encoding.transform(df, **kwargs)
+                return df, rule
+            
+            else:
+                df = self.encoding.transform(df, **kwargs)
+                return df
         
         else:
             raise ValueError(f"Invalid encoder type {type(self.encoding)}")
-
-        return df
 
     def score(self, data):
         df = data.copy()
         df = self.transform(df)
         score_ss = df[self.columns].sum(axis=1)
-        score_ss.rename(f"Score - {self.name}", inplace=True)
+        score_ss.rename(f"{self.name} score", inplace=True)
         return score_ss
 
     def label(self, data, score_col):
@@ -54,12 +58,12 @@ class Scoring(object):
         
         for i in self.labeling:
             label_ss = i.label(df, score_col)
-            label_ss.rename(f"Label - {i.name}", inplace=True)
+            label_ss.rename(f"{i.name} for scoring {self.name}", inplace=True)
         
-        if label_df is None:
-            label_df = pd.DataFrame([label_ss]).T
+            if label_df is None:
+                label_df = pd.DataFrame([label_ss]).T
         
-        else:
-            label_df = pd.concat([label_df, label_ss], axis=1)
+            else:
+                label_df = pd.concat([label_df, label_ss], axis=1)
         
         return label_df
