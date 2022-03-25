@@ -37,7 +37,7 @@ class TestEncoder(unittest.TestCase):
         expected[TestEncoder.question_col] = expected[TestEncoder.question_col].fillna(3)
         assert_frame_equal(result, expected, check_dtype=False)
 
-    def test_transform_default_series(self):
+    def test_transform_default_ss(self):
         result = TestEncoder.encoder_2.transform(self.df['6'])
         assert_series_equal(TestEncoder.original['6'], self.df['6'])
 
@@ -95,6 +95,8 @@ class TestEncoder(unittest.TestCase):
     
     def test_transform_mix(self):
         # Test when column and ignore list are used together.
+        # Test when column, ignore list and return rules are used together
+        # Test when mode and return_rule are used together.
         pass
     
     def test_inverse(self):
@@ -115,7 +117,7 @@ class TestEncoder(unittest.TestCase):
         expected_2[TestEncoder.question_col] = expected_2[TestEncoder.question_col].fillna(3)
         assert_frame_equal(result_2, expected_2, check_dtype=False)
     
-    def test_count_neutral_series(self):
+    def test_count_neutral_ss(self):
         result = TestEncoder.encoder_2.count_neutral(self.df['6'])
         assert_frame_equal(TestEncoder.original, self.df)
 

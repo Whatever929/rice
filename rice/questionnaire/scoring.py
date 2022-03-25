@@ -12,6 +12,9 @@ class Scoring(object):
 
         Might need to implement auto mode instead of specifying the encoding manually. You can
         infer the columns using the return rule in the encoding.
+
+        TODO: It should possible for scoring to not have encoding, as some data are already encoded
+        TODO: For the above case, need to support taking in arbitrary columns
         """
         self.encoding = encoding
         self.name = name
