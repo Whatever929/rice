@@ -5,9 +5,6 @@ from rice.questionnaire import Encoder
 
 class MultiEncoder(object):
   def __init__(self, encoding_rule):
-    """If more than one encoding rule can be applied in a specific column, the first encoding rule
-    will take precedence.
-    """
     if isinstance(encoding_rule, Encoder):
       self.rules = {
         encoding_rule.name: encoding_rule
@@ -27,9 +24,6 @@ class MultiEncoder(object):
       raise ValueError(f"Expected list of encoder or dictionary objects, got {type(encoding_rule)} instead")
     
   def transform(self, data,*, rule_map=None, columns=None, ignore_list=None, return_rule=False, mode="any"):
-    """For each column, value count them, then, if the match all, transform, else, can skip"""
-    "If rule map is specified, encode using the rule map, else, use the auto one"
-    "Need to refactor this, maybe can combine logic of DataFrame and Series"
     result = data.copy()
     encode_rule = None
     if isinstance(data, pd.DataFrame):
@@ -55,9 +49,9 @@ class MultiEncoder(object):
               else:
                 raise ValueError("rule argument can only be strict or any")
       else:
-        pass
         # Check for correct format for rule_map
         # Transform according to the rules
+        pass
 
     elif isinstance(data, pd.Series):
       encode_rule = pd.Series(dtype=str, index=[data.name])

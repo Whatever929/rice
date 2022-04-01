@@ -4,16 +4,11 @@ from scipy.stats import ttest_ind, chisquare
 from ..util import generate_name, plot_each_col
 
 class Questionnaire(object):
-    """
-    Does not support different multiple encodings for the same column.
-    """  
-    def __init__(self, data, scoring, items=None, descrip=None):
-        # Total items refer to those in scoring + those in items.
-        # What about those that do not have scoring but still needs encoding? Can add encoding to it.
+    def __init__(self, data, scoring, descrip=None):
         self.data = data.copy() # Original data
         self.descrip = descrip # Used for plotting and analysis, takes a Description object
         self._cached = {
-            "transform": None,
+            "transform": None, # Will only contain transformed columns
             "score": None,
             "label": None,
             "data": self.data,
@@ -112,11 +107,6 @@ class Questionnaire(object):
         self._plot(columns = self.item_col, kind='count', transformed=transformed, **kwargs)
     
     def diff(self, col, transformed=True):
-        # Compare the mean difference of score for set of items between two info/label columns
-        # Should be in the format of:
-        # col_value_1 - col_value_2, col_value_1 - col_value_3, col_value_2 - col_value_3
-        # item_1
-        # item_2
         if col not in self._cached['data'].columns:
             self.label()
         
@@ -152,8 +142,6 @@ class Questionnaire(object):
         return test_result
     
     def chi_squared(self, info_col):
-        # Compare the labels in the scoring and between the info_col (which consists of various information)
-        # Test for equal distribution
         self.label()
         df = self._cached['data']
         test_result = dict()
@@ -167,7 +155,6 @@ class Questionnaire(object):
         pass
 
     def drop(self, idx):
-        # Do we want to keep the original?
         self.data.drop(idx, inplace=True)
         self.reset_cache()
 

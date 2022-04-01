@@ -6,14 +6,6 @@ class Encoder(object):
     name_generator = generate_name("encoder")
 
     def __init__(self, encoding=None, *, template=None, inverse=False, default=None, neutral=None, dtype=None, name=None):
-        "Default is used for filling NaN values"
-        "Neutral is used for scoring"
-        "Encoding is a dictionary"
-        "Do we want to support range in encoding?"
-        "Cannot pass default and neutral as None, does not have intended effect, can create closure object if needed https://stackoverflow.com/questions/255429/determine-if-a-named-parameter-was-passed"
-        "Must enforce dtype consistency! Always use string if not specified, needs to focus on the dtype in the future"
-        "If dtype does not match the default, will have problem"
-
         if encoding is not None:
             self.encoding = encoding
             self.target = self.encoding.keys()
@@ -46,7 +38,6 @@ class Encoder(object):
             self.name = name
     
     def inverse(self):
-        "Inverse the encoding"
         encode_item = sorted(self.encoding.items(), key=lambda x:x[1], reverse=True)
         target = [i for i, j in encode_item]
         values = [j for i, j in encode_item]
@@ -54,8 +45,6 @@ class Encoder(object):
         
     
     def transform(self, data, *, columns=None, ignore_list=None, return_rule=False, mode='any'):
-        # If columns are specified, then mode is not used anymore
-        # Ignore_list will always be used whether we are using columns or mode
         result = data.copy()
 
         if isinstance(data, pd.Series):
@@ -108,9 +97,6 @@ class Encoder(object):
             raise TypeError(f"Expected pandas Series or DataFrame, got {type(data)} instead")
     
     def count_neutral(self, data, **kwargs):
-        """Count the number of neutral responses, if 'neutral' is available
-        for now only pd.Series is supported
-        """
         if self.neutral is not None:
             if isinstance(data, pd.Series):
                 total = (self.transform(data) == self.neutral).astype(int)

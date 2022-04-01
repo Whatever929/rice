@@ -5,15 +5,6 @@ from ..util import generate_name
 class Scoring(object):
     name_generator = generate_name("scoring")
     def __init__(self, labeling, encoding=None,*, name=None, columns=None):
-        """Encoding must be a mapping of encoding object and corresponding column or a MultiEncoder.
-        Might support array of SingleEncoder in the future.
-
-        Can support multiple labeling, this is because for data with unknown labeling or no labeling,
-        the user can try on different label.
-
-        Might need to implement auto mode instead of specifying the encoding manually. You can
-        infer the columns using the return rule in the encoding.
-        """
         self.encoding = encoding
         self.name = name
         self.labeling = labeling if isinstance(labeling, list) else [labeling] # Used for categorization
