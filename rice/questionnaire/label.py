@@ -17,4 +17,4 @@ class Label(object):
       self.name = next(Label.name_generator)
   
   def label(self, data, score_col, **kwargs):
-    self.label_function(data, score_col, **kwargs)
+    return self.label_function(data, score_col, **kwargs)

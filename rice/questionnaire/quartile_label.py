@@ -12,9 +12,10 @@ class Quartile_Label(Label):
         """
         self.q = q
         self.labels = labels
-        super(self.generate_label_function(self.q, self.labels), name)
+        super().__init__(self.generate_label_function(self.q, self.labels), name)
     
     def generate_label_function(self, q, labels):
-        def label(self, data, score_col):
-            label_ss = pd.qcut(data[score_col], q=q. labels=labels)
+        def label(data, score_col):
+            label_ss = pd.qcut(data[score_col], q=q, labels=labels)
+            return label_ss
         return label

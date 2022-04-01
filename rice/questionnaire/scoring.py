@@ -13,9 +13,6 @@ class Scoring(object):
 
         Might need to implement auto mode instead of specifying the encoding manually. You can
         infer the columns using the return rule in the encoding.
-
-        TODO: It should possible for scoring to not have encoding, as some data are already encoded
-        TODO: For the above case, need to support taking in arbitrary columns
         """
         self.encoding = encoding
         self.name = name
@@ -83,3 +80,11 @@ class Scoring(object):
                 label_df = pd.concat([label_df, label_ss], axis=1)
         
         return label_df
+    
+    @property
+    def score_col(self):
+        return f"{self.name} score"
+    
+    @property
+    def label_col(self):
+        return [f"{self.name} - Label {i.name}" for i in self.labeling]

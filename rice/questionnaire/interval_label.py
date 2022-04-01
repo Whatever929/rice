@@ -11,14 +11,13 @@ class Interval_Label(Label):
         Ours are also inclusive by default too
         """
         self.label_rule = label_rule
-        super(self.generate_label_function(self.label_rule), name)
+        super().__init__(self.generate_label_function(self.label_rule), name)
     
     def generate_label_function(self, label_rule):
-        def label(self, data, score_col):
+        def label(data, score_col):
             """Only support numerical pandas series, will support multiple score_col in the future"""
             label_ss = pd.Series(index=data.index, dtype=str)
             for label, interval in label_rule.items():
                 label_ss[data[score_col].between(*interval)] = label
-
             return label_ss
         return label

@@ -52,7 +52,7 @@ class Questionnaire(object):
                     result_df = pd.concat([result_df, score_ss], axis=1)
             
             self._cached['score'] = result_df
-            self._cached['data'] = pd.concat([self._cached['data'], self._cached['score']])
+            self._cached['data'] = pd.concat([self._cached['data'], self._cached['score']], axis=1)
             return result_df
 
     def label(self):
@@ -70,47 +70,46 @@ class Questionnaire(object):
 
             label_df = None
             for scoring in self.scoring:
-                cur_label_df = scoring.label(data, scoring.name + ' score')
+                cur_label_df = scoring.label(data, scoring.score_col)
                 
                 if label_df is None:
                     label_df = cur_label_df 
                 
                 else:
                     label_df = pd.concat([label_df, cur_label_df], axis=1)
+            self._cached['label'] = label_df
+            self._cached['data'] = pd.concat([self._cached['data'], label_df], axis=1)
             return label_df
 
     def _plot(self, columns, kind, transformed, **kwargs):
         data = None
         if self._cached['label'] is not None:
-            data = self_cached['data']
+            data = self._cached['data']
         
         else:
             self.label()
-            data = self_cached['data']
-            if transformed:
-                data[self.item_col] = self._cached['data']
-            plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
+            data = self._cached['data']
+        if transformed:
+            data[self.item_col] = self._cached['transform']
+        plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
 
-    def hist_label(self, *, transformed=True, **kwargs):
+    def hist_label(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.label_col, kind='hist', transformed=transformed, **kwargs)
 
-    def hist_item(self, *, transformed=True, **kwargs):
+    def hist_item(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.item_col, kind='hist', transformed=transformed, **kwargs)
     
-    def hist_score(self, *, transformed=True, **kwargs):
+    def hist_score(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.score_col, kind='hist', transformed=transformed, **kwargs)
-    
-    def bar_label(self, *, transformed=True, **kwargs):
-        self._plot(columns = self.label_col, kind='bar', transformed=transformed, **kwargs)
-    
-    def bar_score(self, *, transformed=True, **kwargs):
-        self._plot(columns = self.score_col, kind='bar', transformed=transformed, **kwargs)
 
-    def boxplot_score(self, *, transformed=True, **kwargs):
+    def boxplot_score(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.score_col, kind='box', transformed=transformed, **kwargs)
     
-    def boxplot_item(self, *, transformed=True, **kwargs):
+    def boxplot_item(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.item_col, kind='box', transformed=transformed, **kwargs)
+    
+    def count_label(self, *, transformed=True, separated=False, **kwargs):
+        self._plot(columns = self.item_col, kind='count', transformed=transformed, **kwargs)
     
     def diff(self, col, transformed=True):
         # Compare the mean difference of score for set of items between two info/label columns
@@ -134,35 +133,41 @@ class Questionnaire(object):
             result[f"{i[0]} - {i[1]}"] = df_group[i[0]] - df_group[i[1]]
         return result
     
-    def cross_tab(self, label, col):
+    def crosstab(self, index, col):
         # Should be a label paired with an info columns
-        pass
+        self.label()
+        return pd.crosstab(self._cached["data"][index], self._cached["data"][col])
     
     def t_test(self, item, info_col, **kwargs):
         # Compare the mean of the scoring or item between two different groups
         df = self._cached['data']
-        if info_col not in self._cached['data']:
+        if info_col not in self._cached['data'].columns:
             self.label()
             df = self._cached['data']
         test_result = dict()
-        for i in combinations(info_col.value_counts().index):
+        for i in combinations(df[info_col].value_counts().index, r=2):
             test_result[f"{i[0]} vs {i[1]}"] = ttest_ind(a = df[df[info_col] == i[0]][item],
                                                          b = df[df[info_col] == i[1]][item],
                                                          **kwargs)
         return test_result
     
-    def chi_squared(self, scoring, info_col):
-        # Compare the labels in the scoring and between the info_col
-        # If more than one label
-        
+    def chi_squared(self, info_col):
+        # Compare the labels in the scoring and between the info_col (which consists of various information)
+        # Test for equal distribution
+        self.label()
+        df = self._cached['data']
+        test_result = dict()
+        for i in self.scoring:
+            # test for chi_squared
+            pass
+        return
 
     def cluster(self, scoring):
         # Use KMeans clustering to cluster the response to something
+        pass
 
     def drop(self, idx):
-        """
-        Do we want to keep the original?
-        """
+        # Do we want to keep the original?
         self.data.drop(idx, inplace=True)
         self.reset_cache()
 
