@@ -1,5 +1,5 @@
 import pandas as pd
-from rice.questionnaire import Label
+from tickcounter.questionnaire import Label
 from ..util import generate_name
 
 class Interval_Label(Label):

@@ -6,7 +6,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"rice"
+project = u"tickcounter"
 copyright = u"2022, Ong Eng Kheng"
 author = u"Ong Eng Kheng"
 

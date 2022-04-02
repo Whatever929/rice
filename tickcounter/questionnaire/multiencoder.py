@@ -1,7 +1,7 @@
 import pandas as pd
 from ..util import generate_name
 
-from rice.questionnaire import Encoder
+from tickcounter.questionnaire import Encoder
 
 class MultiEncoder(object):
   def __init__(self, encoding_rule):

@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 import numpy as np
-from rice.questionnaire import Encoder, MultiEncoder, Scoring
+from tickcounter.questionnaire import Encoder, MultiEncoder, Scoring
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 class TestScoring(unittest.TestCase):
