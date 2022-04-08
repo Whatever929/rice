@@ -130,6 +130,7 @@ class Questionnaire(object):
     
     def t_test(self, item, info_col, **kwargs):
         # Compare the mean of the scoring or item between two different groups
+        # Should we use like this? Or should we actually use ANOVA for more than 2 groups?
         df = self._cached['data']
         if info_col not in self._cached['data'].columns:
             self.label()
