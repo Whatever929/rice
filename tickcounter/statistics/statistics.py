@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from scipy.stats import ttest_ind, chisquare, f_oneway, contingency
 from ..findings import TTestFindings, DependenceFindings, ChiSquaredFindings, TestResult, FindingsList
@@ -131,3 +132,25 @@ def _auto_detect(data, num_col, cat_col, cohen_es=0.2, eta=0.06, phi_es=0.2, p_v
             findings_list.append(findings)
     
     return FindingsList(findings_list)
+
+def _diff_group(data, group_col, num_col):
+    df_group = data.groupby(col)[num_col].mean().T
+    result = pd.DataFrame(index=df_group.index)
+    for i in itertools.combinations(df_group.columns, 2):
+        result[f"{i[0]} - {i[1]}"] = df_group[i[0]] - df_group[i[1]]
+    return result
+
+def _diff(data, *args):
+    # TODO: Check the len of each args sample.
+    result = pd.DataFrame(index=pd.RangeIndex(len(args[0])))
+    for i in itertools.combinations(df_group.columns, 2):
+        result[f"{i[0]} - {i[1]}"] = df_group[i[0]] - df_group[i[1]]
+    return result
+
+def _t_test_group(data, group_col, num_col, **kwargs):
+    test_result = dict()
+    for i in itertools.combinations(data[group_col].value_counts().index, r=2):
+        test_result[f"{i[0]} vs {i[1]}"] = ttest_ind(a = df[df[group_col] == i[0]][num_col],
+                                                     b = df[df[group_col] == i[1]][num_col],
+                                                     **kwargs)
+    return test_result

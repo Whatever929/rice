@@ -111,45 +111,30 @@ class Questionnaire(object):
             self.label()
         
         if transformed:
-            df_group = self._cached['data'].copy()
-            df_group[self.item_col] = self.transform()
+            data = self._cached['data'].copy()
+            data[self.item_col] = self.transform()
         
         else:
-            df_group = self._cached['data']
+            data = self._cached['data']
 
-        df_group = df_group.groupby(col)[self.item_col].mean().T
-        result = pd.DataFrame(index=df_group.index)
-        for i in combinations(df_group.columns, 2):
-            result[f"{i[0]} - {i[1]}"] = df_group[i[0]] - df_group[i[1]]
-        return result
+        return statistics._diff_group(self.data, group_col=col, num_col=self.item_col)
     
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
         self.label()
         return pd.crosstab(self._cached["data"][index], self._cached["data"][col])
     
-    def t_test(self, item, info_col, **kwargs):
-        # Compare the mean of the scoring or item between two different groups
-        # Should we use like this? Or should we actually use ANOVA for more than 2 groups?
+    def t_test_group(self, item, info_col, **kwargs):
         df = self._cached['data']
         if info_col not in self._cached['data'].columns:
             self.label()
             df = self._cached['data']
-        test_result = dict()
-        for i in combinations(df[info_col].value_counts().index, r=2):
-            test_result[f"{i[0]} vs {i[1]}"] = ttest_ind(a = df[df[info_col] == i[0]][item],
-                                                         b = df[df[info_col] == i[1]][item],
-                                                         **kwargs)
-        return test_result
+        return statistics._t_test_group(data=df, group_col=info_col, num_col=item, **kwargs)
     
-    def chi_squared(self, info_col):
+    def chi_squared_dependence(self, info_col, num_col=None):
         self.label()
         df = self._cached['data']
-        test_result = dict()
-        for i in self.scoring:
-            # test for chi_squared
-            pass
-        return
+        pass
 
     def cluster(self, scoring):
         # Use KMeans clustering to cluster the response to something

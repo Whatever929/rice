@@ -8,7 +8,9 @@ from .statistics import _compare_group, \
                         _compute_phi_es,\
                         _filter_sparse_group,\
                         _t_test,\
-                        _auto_detect
+                        _auto_detect,\
+                        _diff,\
+                        _t_test_group
 __all__ = [
     "_compare_group", 
     "_compare_mean",
@@ -21,4 +23,6 @@ __all__ = [
     "_filter_sparse_group",
     "_t_test",
     "_auto_detect",
+    "_diff",
+    "_t_test_group"
 ]
