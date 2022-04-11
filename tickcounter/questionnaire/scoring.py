@@ -57,8 +57,12 @@ class Scoring(object):
         score_ss.rename(f"{self.name} score", inplace=True)
         return score_ss
 
-    def label(self, data, score_col):
+    def label(self, data, score_col=None):
         label_df = None
+        if score_col is None:
+            data = data.copy()
+            data = pd.concat([data, self.score(data)], axis=1)
+            score_col = self.score_col
         
         for i in self.labeling:
             label_ss = i.label(data, score_col)
@@ -69,7 +73,7 @@ class Scoring(object):
         
             else:
                 label_df = pd.concat([label_df, label_ss], axis=1)
-        
+
         return label_df
     
     @property

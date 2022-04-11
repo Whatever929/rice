@@ -125,12 +125,13 @@ class TestMultiEncoder(unittest.TestCase):
     
     def test_count_neutral_ss(self):
         # On non-matching series, should return None as there is no matching encoder.
-        # We cannot assume that we will encode series, just like single encoder, because we don't know which encoder to use.
+        # We cannot assume that we will encode series, unlike single encoder, because we don't know which encoder to use.
         result_1 = TestMultiEncoder.me3.count_neutral(self.df[TestMultiEncoder.col_2[0]])
         # On matching series
         result_2 = TestMultiEncoder.me1.count_neutral(self.df[TestMultiEncoder.col_1[0]])
         # On series with no neutral matching
-        result_3 = TestMultiEncoder.me2.count_neutral(self.df[TestMultiEncoder.col_3[0]])
+        with self.assertWarns(UserWarning):
+            result_3 = TestMultiEncoder.me2.count_neutral(self.df[TestMultiEncoder.col_3[0]])
         assert_frame_equal(self.df, TestMultiEncoder.original)
         
         expected_2 = (self.df[TestMultiEncoder.col_1[0]] == "Don't know") | (self.df[TestMultiEncoder.col_1[0]].isna())
@@ -146,7 +147,8 @@ class TestMultiEncoder(unittest.TestCase):
         # Matching columns with neutral
         result_2 = TestMultiEncoder.me1.count_neutral(self.df[["self_employed", "work_interfere"]])
         # Matching columns with no neutral
-        result_3 = TestMultiEncoder.me2.count_neutral(self.df[TestMultiEncoder.col_3])
+        with self.assertWarns(UserWarning):
+            result_3 = TestMultiEncoder.me2.count_neutral(self.df[TestMultiEncoder.col_3])
         self.assertIsNone(result_1, None)
         df_temp = self.df[["self_employed", "work_interfere"]].copy()
         df_temp['self_employed'] = df_temp['self_employed'].replace(TestMultiEncoder.scale_1)
