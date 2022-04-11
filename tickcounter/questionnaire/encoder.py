@@ -11,6 +11,7 @@ class Encoder(object):
             self.target = self.encoding.keys()
             self.default = default
             self.neutral = neutral
+            # At the moment, dtype is not used
             if dtype is None:
                 self.dtype = str
             else:

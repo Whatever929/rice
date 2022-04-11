@@ -2,7 +2,7 @@ import pandas as pd
 from tickcounter.questionnaire import Label
 from ..util import generate_name
 
-class Quartile_Label(Label):
+class QuartileLabel(Label):
     def __init__(self, q, labels, name=None):
         self.q = q
         self.labels = labels

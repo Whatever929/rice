@@ -2,7 +2,7 @@ import pandas as pd
 from tickcounter.questionnaire import Label
 from ..util import generate_name
 
-class Interval_Label(Label):
+class IntervalLabel(Label):
     def __init__(self, label_rule, name=None):
         self.label_rule = label_rule
         super().__init__(self.generate_label_function(self.label_rule), name)

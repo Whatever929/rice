@@ -8,7 +8,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 class TestScoring(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestMultiEncoder, cls).setUpClass()
+        super(TestScoring, cls).setUpClass()
         cls.original = pd.read_csv("test/test_data/big_five/data_reduced.csv")
         cls.scale_a = {
                     0.0: 3,
@@ -34,24 +34,24 @@ class TestScoring(unittest.TestCase):
         cls.CSN = [f"CSN{i}" for i in range(1, 11)]
         cls.OPN = [f"EXT{i}" for i in range(1, 11)]
         cls.s1 = Scoring(encoding={
-                        e1: TestMultiEncoder.EXT[0::2],
-                        e2: TestMultiEncoder.EXT[1::2],
+                        e1: MultiEncoder.EXT[0::2],
+                        e2: MultiEncoder.EXT[1::2],
                         }, labeling=l1, name='Extraversion')
         cls.s2 = Scoring(encoding={
-                        e1: TestMultiEncoder.CSN[0::2],
-                        e2: TestMultiEncoder.CSN[1::2],
+                        e1: MultiEncoder.CSN[0::2],
+                        e2: MultiEncoder.CSN[1::2],
                         }, labeling=l1, name='Consciousness')
         cls.s3 = Scoring(encoding={
-                        e1: TestMultiEncoder.EST[0::2],
-                        e2: TestMultiEncoder.EST[1::2],
+                        e1: MultiEncoder.EST[0::2],
+                        e2: MultiEncoder.EST[1::2],
                         }, labeling=l1, name='Neuroticism')
         cls.s4 = Scoring(encoding={
-                        e2: TestMultiEncoder.AGR[0::2],
-                        e1: TestMultiEncoder.AGR[1::2],
+                        e2: MultiEncoder.AGR[0::2],
+                        e1: MultiEncoder.AGR[1::2],
                         }, labeling=l1, name='Agreeableness')
         cls.s5 = Scoring(encoding={
-                        e1: TestMultiEncoder.OPN[0::2],
-                        e2: TestMultiEncoder.OPN[1::2],
+                        e1: MultiEncoder.OPN[0::2],
+                        e2: MultiEncoder.OPN[1::2],
                         }, labeling=l1, name='Openness')
         cls.s6 = Scoring(labeling=l1, name='Agreeness')
         
