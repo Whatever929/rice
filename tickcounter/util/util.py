@@ -117,3 +117,6 @@ def plot_trend(data, y, x=None, ax=None,
     ax = sns.lineplot(data=data, x=x, y=y, ax=ax, label=label)
 
   return ax
+
+def allow_values(data, col, values):
+  return data[data[col].isin(values)]
