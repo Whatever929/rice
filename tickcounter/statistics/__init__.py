@@ -10,7 +10,8 @@ from .statistics import _compare_group, \
                         _t_test,\
                         _auto_detect,\
                         _diff,\
-                        _t_test_group
+                        _t_test_group,\
+                        _diff_group
 __all__ = [
     "_compare_group", 
     "_compare_mean",
@@ -24,5 +25,6 @@ __all__ = [
     "_t_test",
     "_auto_detect",
     "_diff",
-    "_t_test_group"
+    "_t_test_group",
+    "_diff_group"
 ]

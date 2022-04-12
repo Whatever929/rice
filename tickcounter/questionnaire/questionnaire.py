@@ -1,7 +1,9 @@
 import pandas as pd
 from itertools import combinations
 from scipy.stats import ttest_ind, chisquare
-from ..util import generate_name, plot_each_col
+from ..util import generate_name
+
+from tickcounter import plot, statistics
 
 class Questionnaire(object):
     def __init__(self, data, scoring, descrip=None):
@@ -86,7 +88,7 @@ class Questionnaire(object):
             data = self._cached['data']
         if transformed:
             data[self.item_col] = self._cached['transform']
-        plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
+        plot.plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
 
     def hist_label(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.label_col, kind='hist', transformed=transformed, **kwargs)
@@ -104,20 +106,20 @@ class Questionnaire(object):
         self._plot(columns = self.item_col, kind='box', transformed=transformed, **kwargs)
     
     def count_label(self, *, transformed=True, separated=False, **kwargs):
-        self._plot(columns = self.item_col, kind='count', transformed=transformed, **kwargs)
+        self._plot(columns = self.label_col, kind='count', transformed=transformed, **kwargs)
     
-    def diff(self, col, transformed=True):
+    def diff_item(self, col, transformed=True):
         if col not in self._cached['data'].columns:
             self.label()
         
         if transformed:
-            data = self._cached['data'].copy()
-            data[self.item_col] = self.transform()
+            df = self._cached['data'].copy()
+            df[self.item_col] = self.transform()
         
         else:
-            data = self._cached['data']
+            df = self._cached['data']
 
-        return statistics._diff_group(self.data, group_col=col, num_col=self.item_col)
+        return statistics._diff_group(df, group_col=col, num_col=self.item_col)
     
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
@@ -131,10 +133,24 @@ class Questionnaire(object):
             df = self._cached['data']
         return statistics._t_test_group(data=df, group_col=info_col, num_col=item, **kwargs)
     
-    def chi_squared_dependence(self, info_col, num_col=None):
+    def t_test(self, num_col, group_col, group_1, group_2, **kwargs):
         self.label()
         df = self._cached['data']
-        pass
+        return statistics._t_test(df, num_col, group_col, group_1, group_2, **kwargs)
+        
+    def chi_squared_dependence(self, col_1, col_2, min_sample=None):
+        self.label()
+        df = self._cached['data']
+
+        if min_sample is None:
+            group_1 = df[col_1].value_counts().index
+            group_2 = df[col_2].value_counts().index
+        
+        else:
+            group_1, _ = statistics._filter_sparse_group(df, col_1, min_sample)
+            group_2, _ = statistics._filter_sparse_group(df, col_2, min_sample)
+
+        return statistics._chi_squared_dependence(df, col_1, col_2, group_1, group_2)
 
     def cluster(self, scoring):
         # Use KMeans clustering to cluster the response to something

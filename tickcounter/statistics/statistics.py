@@ -134,7 +134,7 @@ def _auto_detect(data, num_col, cat_col, cohen_es=0.2, eta=0.06, phi_es=0.2, p_v
     return FindingsList(findings_list)
 
 def _diff_group(data, group_col, num_col):
-    df_group = data.groupby(col)[num_col].mean().T
+    df_group = data.groupby(group_col)[num_col].mean().T
     result = pd.DataFrame(index=df_group.index)
     for i in itertools.combinations(df_group.columns, 2):
         result[f"{i[0]} - {i[1]}"] = df_group[i[0]] - df_group[i[1]]
