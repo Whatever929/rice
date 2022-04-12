@@ -1,7 +1,7 @@
 Overview
 --------
 
-**tickcounter** is a Python package built to facilliate the process of cleaning, manipulating and analyzing questionnaire or survey related data effectively. 
+**tickcounter** is a Python package built to facilitate the process of cleaning, manipulating and analyzing questionnaire or survey related data effectively. 
 
 Installation
 ------
