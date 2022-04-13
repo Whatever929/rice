@@ -89,6 +89,8 @@ class Questionnaire(object):
         if transformed:
             data[self.item_col] = self._cached['transform']
         plot.plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
+    
+    def auto_detect(self, )
 
     def hist_label(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.label_col, kind='hist', transformed=transformed, **kwargs)

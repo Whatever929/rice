@@ -19,12 +19,15 @@ class AnovaFindings(Findings):
                     + descrip_mean
         return descrip
     
+    def describe_short(self):
+        return f"Value of {self.num_col} between {self.groups} are not independent."
+
     def illustrate(self, ax=None, **kwargs):
         data = allow_values(self.data, self.group_col, self.groups)
         if ax is None:
-            sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, **kwargs)
+            ax = sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, **kwargs)
+            ax.set_title(self.describe_short())
         
         else:
             sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, ax=ax, **kwargs)
-
-
+            ax.set_title(self.describe_short())

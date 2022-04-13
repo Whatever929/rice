@@ -4,12 +4,12 @@ from matplotlib import pyplot as plt
 import math
 
 def plotter(f):
-  def plotter_function(*args, figsize=(12, 12), title=None, **kwargs):
+  def plotter_function(*args, figsize=(12, 12), title=None, y=1.05, **kwargs):
     plt.figure(figsize=figsize, tight_layout=True)
     f(*args, **kwargs)
     figure = plt.gcf()
     if title is not None:
-      figure.suptitle(title, fontsize=16, y=1.05)
+      figure.suptitle(title, fontsize=16, y=y)
   return plotter_function
   
 @plotter

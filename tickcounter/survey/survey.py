@@ -1,6 +1,6 @@
 import numpy as np
 from ..util import plot_each_col
-from tickcounter import statistics
+from tickcounter import statistics, plot
 
 import itertools
 
@@ -64,11 +64,14 @@ class Survey(object):
     def chi_squared_dependence(self, col_1, col_2, groups_1, groups_2):
         return statistics._chi_squared_dependence(self.data, col_1, col_2, groups_1, groups_2)
 
-    def hist_num(self):
-        pass
+    def hist_num(self, **kwargs):
+        return self._plot(columns=self.num_col, kind='hist', **kwargs)
     
-    def bar_cat(self):
-        pass
+    def count_cat(self, **kwargs):
+        return self._plot(columns=self.cat_col, kind='count', **kwargs)
+    
+    def _plot(self, columns, kind, **kwargs):
+        return plot.plot_each_col(data=self.data, col_list=columns, plot_type=kind, **kwargs)
 
     def _handle_null(self, data, col):
         return data.dropna(subset=col)

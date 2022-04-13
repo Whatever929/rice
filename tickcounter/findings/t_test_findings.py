@@ -20,12 +20,16 @@ class TTestFindings(Findings):
                f"({group_1_mean:.2f}) is {'less' if group_1_mean > group_2_mean else 'more'} than "\
                f"{self.group_2} ({group_2_mean:.2f}) with p_value of {self.test_result.pvalue:.2f}."
     
+    def describe_short(self):
+        return f"Values in {self.num_col} between {self.group_1} and {self.group_2} are not independent"
+    
     def illustrate(self, ax=None, **kwargs):
         data = allow_values(self.data, self.group_col, [self.group_1, self.group_2])
         if ax is None:
-            sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, **kwargs)
+            ax = sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, **kwargs)
+            ax.set_title(self.describe_short())
         
         else:
             sns.barplot(data=data, x=self.group_col, y=self.num_col, estimator=np.mean, ax=ax, **kwargs)
+            ax.set_title(self.describe_short())
             
-        

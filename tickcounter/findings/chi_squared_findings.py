@@ -24,6 +24,12 @@ class ChiSquaredFindings(Findings):
         else:
             self._illustrate_expected(ax)
     
+    def _describe_short_equal(self):
+        return f"{self.groups} are not equal in proportion"
+    
+    def _describe_short_proportion(self):
+        return f"{self.groups} does not match expected proportion {self.test_result.expected}"
+    
     def _describe_equal(self):
         return f"Column {self.col} with categories {self.groups} are not equal, at pvalue of {self.test_result.pvalue:.2f} ({self.test_result.name})"
     

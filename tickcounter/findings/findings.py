@@ -9,5 +9,9 @@ class Findings(object):
         pass
 
     @abstractmethod
+    def describe_short(self):
+        pass
+
+    @abstractmethod
     def illustrate(self, ax):
         pass

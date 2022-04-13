@@ -16,11 +16,16 @@ class DependenceFindings(Findings):
         return f"{self.col_1} (with categories {list(self.groups_1)}) and {self.col_2} " \
                f"(with categories {list(self.groups_2)}) are not independent, with pvalue of " \
                f"{self.test_result.pvalue:.2f} (chi-squared)"
+
+    def describe_short(self):
+        return f"{self.col_1} and {self.col_2} are not independent"
     
     def illustrate(self, ax=None):
         data = allow_values(self.data, self.col_1, self.groups_1)
         data = allow_values(data, self.col_2, self.group_2)
         if ax is None:
-            sns.countplot(data=data, x=self.col_1, y=self.col_2)
+            ax = sns.countplot(data=data, x=self.col_1, y=self.col_2)
+            ax.set_title(self.describe_short())
         else:
             sns.countplot(data=data, x=self.col_1, y=self.col_2, ax=ax)
+            ax.set_title(self.describe_short())
