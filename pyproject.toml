@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tickcounter"
-version = "0.1.1"
-description = "A library for processing questionnaire data"
+version = "0.2.0"
+description = "A library for processing survey data"
 authors = ["Ong Eng Kheng"]
 license = "MIT"
 readme = "README.md"
