@@ -1,7 +1,8 @@
 import pandas as pd
-from itertools import combinations
 from scipy.stats import ttest_ind, chisquare
 from ..util import generate_name
+
+import itertools
 
 from tickcounter import plot, statistics
 
@@ -90,7 +91,26 @@ class Questionnaire(object):
             data[self.item_col] = self._cached['transform']
         plot.plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
     
-    def auto_detect(self, )
+    def auto_detect(self, group_col, num_col=None, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
+        group_col = [group_col] if type(group_col) == str else group_col
+        group_col.extend(self.label_col)
+        if num_col is not None:
+            num_col = [num_col] if type(num_col) == str else num_col
+            num_col.extend(self.score_col)
+        else:
+            num_col = self.score_col
+        self.label()
+        df = self._cached['data']
+        ignore_list = set(itertools.product(self.score_col, self.label_col))
+        return statistics._auto_detect(data=df, 
+                                       num_col=num_col,
+                                       cat_col=group_col, 
+                                       cohen_es=cohen_es, 
+                                       eta=eta, 
+                                       phi_es=phi_es, 
+                                       p_value=p_value, 
+                                       min_sample=min_sample,
+                                       ignore_list=ignore_list)
 
     def hist_label(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.label_col, kind='hist', transformed=transformed, **kwargs)

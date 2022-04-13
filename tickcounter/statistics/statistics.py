@@ -117,19 +117,36 @@ def _filter_sparse_group(data, group_col, min_sample):
     result = group_count.drop(ignored.index)
     return result.index, ignored.index
 
-def _auto_detect(data, num_col, cat_col, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
+def _auto_detect(data, 
+                 num_col, 
+                 cat_col, 
+                 cohen_es=0.2, 
+                 eta=0.06, 
+                 phi_es=0.2, 
+                 p_value=0.05, 
+                 min_sample=20, 
+                 ignore_list=None):
     findings_list = []
+    ignore_list = [] if ignore_list is None else ignore_list
     # Compare mean
     for n_col, c_col in itertools.product(num_col, cat_col):
-        findings = _compare_mean(data, n_col, c_col, cohen_es=cohen_es, eta=eta, p_value=p_value, min_sample=min_sample)
-        if findings is not None:
-            findings_list.append(findings)
+        # TODO: Check if this is inefficient.
+        if ((n_col, c_col) in ignore_list) or ((c_col, n_col) in ignore_list):
+            continue
+        else:
+            findings = _compare_mean(data, n_col, c_col, cohen_es=cohen_es, eta=eta, p_value=p_value, min_sample=min_sample)
+            if findings is not None:
+                findings_list.append(findings)
 
     # Compare dependency of two cat_col
     for col_1, col_2 in itertools.combinations(cat_col, r=2):
-        findings = _compare_group(data, col_1, col_2, p_value=p_value, phi_es=phi_es, min_sample=min_sample)
-        if findings is not None:
-            findings_list.append(findings)
+        # TODO: Check if this is inefficient.
+        if ((col_1, col_2) in ignore_list) or ((col_2, col_1) in ignore_list):
+            continue
+        else:
+            findings = _compare_group(data, col_1, col_2, p_value=p_value, phi_es=phi_es, min_sample=min_sample)
+            if findings is not None:
+                findings_list.append(findings)
     
     return FindingsList(findings_list)
 

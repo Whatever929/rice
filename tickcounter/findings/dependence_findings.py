@@ -22,10 +22,10 @@ class DependenceFindings(Findings):
     
     def illustrate(self, ax=None):
         data = allow_values(self.data, self.col_1, self.groups_1)
-        data = allow_values(data, self.col_2, self.group_2)
+        data = allow_values(data, self.col_2, self.groups_2)
         if ax is None:
-            ax = sns.countplot(data=data, x=self.col_1, y=self.col_2)
+            ax = sns.countplot(data=data, x=self.col_1, hue=self.col_2)
             ax.set_title(self.describe_short())
         else:
-            sns.countplot(data=data, x=self.col_1, y=self.col_2, ax=ax)
+            sns.countplot(data=data, x=self.col_1, hue=self.col_2, ax=ax)
             ax.set_title(self.describe_short())
