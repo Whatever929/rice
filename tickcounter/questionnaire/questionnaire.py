@@ -130,6 +130,20 @@ class Questionnaire(object):
     def count_label(self, *, transformed=True, separated=False, **kwargs):
         self._plot(columns = self.label_col, kind='count', transformed=transformed, **kwargs)
     
+    def locate_outlier(self, columns, method='iqr', return_rule=False, zscore_threshold=3):
+        # Note that we work on the original data
+        if method == 'iqr':
+            outlier, outlier_range =  statistics._locate_outlier_iqr(data=self.data, columns=columns)
+        elif method == 'zscore':
+            outlier, outlier_range = statistics._locate_outlier_zscore(data=self.data, columns=columns, zscore_threshold=zscore_threshold)
+        else:
+            raise ValueError("method argument can only be either 'iqr" or 'zscore')
+
+        if return_rule:
+            return outlier, outlier_range
+        else:
+            return outlier
+    
     def diff_item(self, col, transformed=True):
         if col not in self._cached['data'].columns:
             self.label()

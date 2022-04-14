@@ -15,6 +15,10 @@ class FindingsList(object):
         descrip_ss = pd.Series([i.describe() for i in self.findings_list])
         return descrip_ss
     
+    def describe_short(self):
+        descrip_ss = pd.Series([i.describe_short() for i in self.findings_list])
+        return descrip_ss
+
     @plot.plotter
     def illustrate(self, n_col=1):
         for i, findings in enumerate(self.findings_list):

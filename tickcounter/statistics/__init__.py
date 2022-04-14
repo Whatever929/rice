@@ -11,7 +11,9 @@ from .statistics import _compare_group, \
                         _auto_detect,\
                         _diff,\
                         _t_test_group,\
-                        _diff_group
+                        _diff_group,\
+                        _locate_outlier_zscore, \
+                        _locate_outlier_iqr
 __all__ = [
     "_compare_group", 
     "_compare_mean",
@@ -26,5 +28,7 @@ __all__ = [
     "_auto_detect",
     "_diff",
     "_t_test_group",
-    "_diff_group"
+    "_diff_group",
+    "_locate_outlier_zscore",
+    "_locate_outlier_iqr"
 ]

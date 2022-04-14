@@ -2,23 +2,24 @@ import numpy as np
 import pandas as pd
 
 from scipy.stats import ttest_ind, chisquare, f_oneway, contingency
-from ..findings import TTestFindings, DependenceFindings, ChiSquaredFindings, TestResult, FindingsList
+from scipy import stats
+from ..findings import TTestFindings, DependenceFindings, ChiSquaredFindings, TestResult, FindingsList, AnovaFindings
 
 import math
 import itertools
 
-def _anova(data, num_col, group_col):
+def _anova(data, num_col, group_col, groups):
     group_samples = []
-    for i in group_count.index:
-        group_samples.append(data[data[cat_col] == i][num_col])
+    for i in groups:
+        group_samples.append(data[data[group_col] == i][num_col])
     test_result = f_oneway(*group_samples)
     effect_size = _compute_eta_squared(*group_samples)
     return test_result, effect_size
 
 def _compute_eta_squared(*args):
     # args refer to the samples for each 
-    all_data = np.array(list(itertools.chain(args)))
-    group_mean = [sample.mean() for i in args]
+    all_data = np.asarray(list(itertools.chain(*args)))
+    group_mean = [i.mean() for i in args]
     group_mean = np.array(group_mean)
     return group_mean.var() / all_data.var()
 
@@ -172,11 +173,11 @@ def _t_test_group(data, group_col, num_col, **kwargs):
                                                      **kwargs)
     return test_result
 
-def _locate_outlier_zscore(df, columns, zscore_threshold, any=True, exclude=False):
+def _locate_outlier_zscore(data, columns, zscore_threshold, any=True, exclude=False):
   '''
   Locate outliers from numerical columns.
   Arguments:
-  df: pandas DataFrame
+  data: pandas DataFrame
   columns: A list of column's names for checking outliers. Must be numerical columns
   zscore_threshold: Threshold for classifying outliers.
   any: If True, classify the data point as outlier if value from one of the column is a outlier.
@@ -184,37 +185,44 @@ def _locate_outlier_zscore(df, columns, zscore_threshold, any=True, exclude=Fals
 
   Returns pandas DataFrame.
   '''
-  mask_include = np.abs(stats.zscore(df[columns])) > zscore_threshold
-  mask_exclude = np.abs(stats.zscore(df[columns])) < zscore_threshold
+  mean = data[columns].mean(axis=0)
+  std = data[columns].std(axis=0)
+  lower_bound = (std * zscore_threshold - mean).rename("Lower_bound")
+  upper_bound = (std * zscore_threshold + mean).rename("Upper_bound")
+  outlier_range = pd.concat([lower_bound, upper_bound], axis=1)
+  # TODO: Make this more efficient
+  # The above workflow is equivalent to below, at 3 decimal points
+  mask_include = np.abs(stats.zscore(data[columns])) > zscore_threshold
+  mask_exclude = np.abs(stats.zscore(data[columns])) < zscore_threshold
 
   if any:
     if exclude:
-      return df[mask_exclude.any(axis=1)]
+      return data[mask_exclude.any(axis=1)]
     else:
-      df = df[mask_include.any(axis=1)]
+      data = data[mask_include.any(axis=1)]
       outlier_field = pd.DataFrame(mask_include, columns=columns)
       outlier_field = outlier_field.apply(lambda x: x.replace(True, x.name).replace(False, ""))
       outlier_field = outlier_field.apply(lambda x: x.str.cat(sep=''), axis=1)
       outlier_field = outlier_field.replace("", np.nan).dropna()
       outlier_field.rename("Outlier_field", inplace=True)
-      assert df.index.equals(outlier_field.index)
-      return pd.concat([df, outlier_field], axis=1)
+      assert data.index.equals(outlier_field.index)
+      return (pd.concat([data, outlier_field], axis=1), outlier_range)
   
   else:
     if exclude:
-      return df[mask_exclude.all(axis=1)]
+      return data[mask_exclude.all(axis=1)]
 
     else:
-      df = df[mask_include.all(axis=1)]
+      data = data[mask_include.all(axis=1)]
       outlier_field = pd.DataFrame(mask_include, columns=columns)
       outlier_field = outlier_field.apply(lambda x: x.replace(True, x.name).replace(False, ""))
       outlier_field = outlier_field.apply(lambda x: x.str.cat(sep=''), axis=1)
       outlier_field = outlier_field.replace("", np.nan).dropna()
       outlier_field.rename("Outlier_field", inplace=True)
-      assert df.index.equals(outlier_field.index)
-      return pd.concat([df, outlier_field], axis=1)
+      assert data.index.equals(outlier_field.index)
+      return (pd.concat([data, outlier_field], axis=1), outlier_range)
 
-def _locate_outlier_iqr(data):
+def _locate_outlier_iqr(data, columns):
   """
   Return all rows that are outliers in at least 1 feature.
 
@@ -234,13 +242,18 @@ def _locate_outlier_iqr(data):
       Contains the interval non-outliers values.
   """
 
-  q1 = data.quantile(0.25)
-  q3 = data.quantile(0.75)
+  q1 = data[columns].quantile(0.25)
+  q3 = data[columns].quantile(0.75)
   out_iqr = 1.5 * (q3 - q1)
   lower_bound = (q1 - out_iqr).rename("Lower bound")
   upper_bound = (q3 + out_iqr).rename("Upper bound")
   outlier_range = pd.concat([lower_bound, upper_bound], axis=1)
 
-  mask = (data[NUM_COL] > out_iqr + q3) | (data[NUM_COL] < q1 - out_iqr)
+  mask = (data[columns] > out_iqr + q3) | (data[columns] < q1 - out_iqr)
+  outlier_field = pd.DataFrame(mask, columns=columns)
+  outlier_field = outlier_field.apply(lambda x: x.replace(True, x.name).replace(False, ""))
+  outlier_field = outlier_field.apply(lambda x: x.str.cat(sep=''), axis=1)
+  outlier_field = outlier_field.replace("", np.nan).dropna()
+  outlier_field.rename("Outlier_field", inplace=True)
   outliers = data[mask.any(axis=1)]
-  return (outliers, outlier_range)
+  return (pd.concat([outliers, outlier_field], axis=1), outlier_range)

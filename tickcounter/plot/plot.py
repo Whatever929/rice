@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 import math
 
 def plotter(f):
-  def plotter_function(*args, figsize=(12, 12), title=None, y=1.05, **kwargs):
-    plt.figure(figsize=figsize, tight_layout=True)
+  def plotter_function(*args, figsize=(12, 12), title=None, y=1.05, tight_layout=True, **kwargs):
+    plt.figure(figsize=figsize, tight_layout=tight_layout)
     f(*args, **kwargs)
     figure = plt.gcf()
     if title is not None:
@@ -19,7 +19,6 @@ def plot_each_col(data,
                   n_col=2, 
                   x=None,
                   rotate=False,
-                  tight_layout=True,
                   **kwargs):
   '''
   Plot a subplot of specified type on each selected column. 
@@ -31,9 +30,6 @@ def plot_each_col(data,
   plot_type: Graph type.
   x: The column for x-axis, used for graphs type like line and trend graph.
   '''
-  if tight_layout:
-    plt.gcf().tight_layout()
-
   if len(col_list) < n_col:
     n_col = len(col_list)
 

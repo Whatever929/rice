@@ -70,6 +70,19 @@ class Survey(object):
     def count_cat(self, **kwargs):
         return self._plot(columns=self.cat_col, kind='count', **kwargs)
     
+    def locate_outlier(self, columns, method='iqr', return_rule=False, zscore_threshold=3):
+        if method == 'iqr':
+            outlier, outlier_range =  statistics._locate_outlier_iqr(data=self.data, columns=columns)
+        elif method == 'zscore':
+            outlier, outlier_range = statistics._locate_outlier_zscore(data=self.data, columns=columns, zscore_threshold=zscore_threshold)
+        else:
+            raise ValueError("method argument can only be either 'iqr" or 'zscore')
+
+        if return_rule:
+            return outlier, outlier_range
+        else:
+            return outlier
+    
     def _plot(self, columns, kind, **kwargs):
         return plot.plot_each_col(data=self.data, col_list=columns, plot_type=kind, **kwargs)
 
