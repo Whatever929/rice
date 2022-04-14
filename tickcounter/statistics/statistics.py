@@ -171,3 +171,76 @@ def _t_test_group(data, group_col, num_col, **kwargs):
                                                      b = df[df[group_col] == i[1]][num_col],
                                                      **kwargs)
     return test_result
+
+def _locate_outlier_zscore(df, columns, zscore_threshold, any=True, exclude=False):
+  '''
+  Locate outliers from numerical columns.
+  Arguments:
+  df: pandas DataFrame
+  columns: A list of column's names for checking outliers. Must be numerical columns
+  zscore_threshold: Threshold for classifying outliers.
+  any: If True, classify the data point as outlier if value from one of the column is a outlier.
+  exclude: If True, return non-outliers. If False, return outliers.
+
+  Returns pandas DataFrame.
+  '''
+  mask_include = np.abs(stats.zscore(df[columns])) > zscore_threshold
+  mask_exclude = np.abs(stats.zscore(df[columns])) < zscore_threshold
+
+  if any:
+    if exclude:
+      return df[mask_exclude.any(axis=1)]
+    else:
+      df = df[mask_include.any(axis=1)]
+      outlier_field = pd.DataFrame(mask_include, columns=columns)
+      outlier_field = outlier_field.apply(lambda x: x.replace(True, x.name).replace(False, ""))
+      outlier_field = outlier_field.apply(lambda x: x.str.cat(sep=''), axis=1)
+      outlier_field = outlier_field.replace("", np.nan).dropna()
+      outlier_field.rename("Outlier_field", inplace=True)
+      assert df.index.equals(outlier_field.index)
+      return pd.concat([df, outlier_field], axis=1)
+  
+  else:
+    if exclude:
+      return df[mask_exclude.all(axis=1)]
+
+    else:
+      df = df[mask_include.all(axis=1)]
+      outlier_field = pd.DataFrame(mask_include, columns=columns)
+      outlier_field = outlier_field.apply(lambda x: x.replace(True, x.name).replace(False, ""))
+      outlier_field = outlier_field.apply(lambda x: x.str.cat(sep=''), axis=1)
+      outlier_field = outlier_field.replace("", np.nan).dropna()
+      outlier_field.rename("Outlier_field", inplace=True)
+      assert df.index.equals(outlier_field.index)
+      return pd.concat([df, outlier_field], axis=1)
+
+def _locate_outlier_iqr(data):
+  """
+  Return all rows that are outliers in at least 1 feature.
+
+  Values exceed Q3 or below Q1 by more than 1.5 IQR will be classified as outliers. 
+
+  Parameters
+  ----------
+  data : pandas.DataFrame
+      Data containing outliers.
+  
+  Returns
+  -------
+  outliers : pandas.DataFrame
+      DataFrame containing all the outliers.
+  
+  outlier_range: pandas.DataFrame.
+      Contains the interval non-outliers values.
+  """
+
+  q1 = data.quantile(0.25)
+  q3 = data.quantile(0.75)
+  out_iqr = 1.5 * (q3 - q1)
+  lower_bound = (q1 - out_iqr).rename("Lower bound")
+  upper_bound = (q3 + out_iqr).rename("Upper bound")
+  outlier_range = pd.concat([lower_bound, upper_bound], axis=1)
+
+  mask = (data[NUM_COL] > out_iqr + q3) | (data[NUM_COL] < q1 - out_iqr)
+  outliers = data[mask.any(axis=1)]
+  return (outliers, outlier_range)
