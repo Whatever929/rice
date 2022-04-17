@@ -16,6 +16,7 @@ class Questionnaire(object):
             "score": None,
             "label": None,
             "data": self.data,
+            "processed_transformed": None,
         }
         self.scoring = scoring if isinstance(scoring, list) else [scoring] # Used for calculating score
     
@@ -81,9 +82,7 @@ class Questionnaire(object):
             return label_df
 
     def _plot(self, columns, kind, transformed, **kwargs):
-        df = self.processed
-        if transformed:
-            df[self.item_col] = self._cached['transform']
+        df = self.processed_transformed if transformed else self.processed
         plot.plot_each_col(df, col_list = columns, plot_type=kind, **kwargs)
     
     def auto_detect(self, group_col, num_col=None, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
@@ -125,11 +124,10 @@ class Questionnaire(object):
         self._plot(columns = self.label_col, kind='count', transformed=transformed, **kwargs)
     
     def locate_outlier(self, columns, method='iqr', return_rule=False, zscore_threshold=3):
-        # Note that we work on the original data
         if method == 'iqr':
-            outlier, outlier_range =  statistics._locate_outlier_iqr(data=self.data, columns=columns)
+            outlier, outlier_range =  statistics._locate_outlier_iqr(data=self.processed, columns=columns)
         elif method == 'zscore':
-            outlier, outlier_range = statistics._locate_outlier_zscore(data=self.data, columns=columns, zscore_threshold=zscore_threshold)
+            outlier, outlier_range = statistics._locate_outlier_zscore(data=self.processed, columns=columns, zscore_threshold=zscore_threshold)
         else:
             raise ValueError("method argument can only be either 'iqr" or 'zscore')
 
@@ -137,7 +135,7 @@ class Questionnaire(object):
             return outlier, outlier_range
         else:
             return outlier
-    
+
     def diff_item(self, col, transformed=True):
         df = self.data
         if col not in df.columns:
@@ -152,8 +150,21 @@ class Questionnaire(object):
 
         return statistics._diff_group(df, group_col=col, num_col=self.item_col)
     
-    def corr_item(self, col, transformed=True):
-        return self.scored.corr()
+    def corr_item(self, columns=None, transformed=True):
+        col = self.item_col.copy()
+        if columns is not None:
+            col.extend(columns)
+        return self._corr(columns=col, transformed=transformed)
+    
+    def corr_score(self, columns=None, transformed=True):
+        col = self.score_col.copy()
+        if columns is not None:
+            col.extend(columns)
+        return self._corr(columns=col, transformed=transformed)
+    
+    def _corr(self, columns, transformed=True):
+        df = self.processed_transformed if transformed else processed
+        return df[columns].corr()
     
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
@@ -165,11 +176,8 @@ class Questionnaire(object):
             df = self.processed
         return statistics._t_test_group(data=df, group_col=info_col, num_col=item, **kwargs)
     
-    def t_test(self, num_col, group_col, min_sample=20, **kwargs):
-        df = self.processed
-        groups_1, ignored_1 = statistics._filter_sparse_group(df, col_1, min_sample)
-        groups_2, ignored_2 = statistics._filter_sparse_group(df, col_2, min_sample)
-        return statistics._t_test(df, num_col, group_col, groups_1, groups_2, **kwargs)
+    def t_test(self, num_col, group_col, group_1, group_2, **kwargs):
+        return statistics._t_test(self.processed, num_col, group_col, group_1, group_2, **kwargs)
         
     def chi_squared_dependence(self, col_1, col_2, min_sample=None):
         df = self.processed
@@ -187,6 +195,9 @@ class Questionnaire(object):
     def scatter_item(self, **kwargs):
         sns.pairplot(data=self.processed, vars=self.item_col, kind='scatter', **kwargs)
 
+    def scatter_score(self, **kwargs):
+        sns.pairplot(data=self.processed, vars=self.score_col, kind='scatter', **kwargs)
+
     def cluster(self, scoring):
         # Use KMeans clustering to cluster the response to something
         pass
@@ -201,6 +212,7 @@ class Questionnaire(object):
             "score": None,
             "label": None,
             "data": self.data,
+            "processed_transformed": None
         }
     
     @property
@@ -249,6 +261,15 @@ class Questionnaire(object):
     def processed(self):
         self.label()
         return self._cached['data']
+    
+    @property
+    def processed_transformed(self):
+        if self._cached['processed_transformed'] is None:
+            df = self.processed.copy()
+            df[self.item_col] = self._cached['transform']
+            self._cached['processed_transformed'] = df
+        
+        return self._cached['processed_transformed']
     
     def __getitem__(self, col):
         try:
