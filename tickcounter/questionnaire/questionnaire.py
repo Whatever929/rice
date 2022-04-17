@@ -1,6 +1,7 @@
 import pandas as pd
 from scipy.stats import ttest_ind, chisquare
 from ..util import generate_name
+import seaborn as sns
 
 import itertools
 
@@ -80,16 +81,10 @@ class Questionnaire(object):
             return label_df
 
     def _plot(self, columns, kind, transformed, **kwargs):
-        data = None
-        if self._cached['label'] is not None:
-            data = self._cached['data']
-        
-        else:
-            self.label()
-            data = self._cached['data']
+        df = self.processed
         if transformed:
-            data[self.item_col] = self._cached['transform']
-        plot.plot_each_col(data, col_list = columns, plot_type=kind, **kwargs)
+            df[self.item_col] = self._cached['transform']
+        plot.plot_each_col(df, col_list = columns, plot_type=kind, **kwargs)
     
     def auto_detect(self, group_col, num_col=None, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
         group_col = [group_col] if type(group_col) == str else group_col
@@ -99,8 +94,7 @@ class Questionnaire(object):
             num_col.extend(self.score_col)
         else:
             num_col = self.score_col
-        self.label()
-        df = self._cached['data']
+        df = self.processed
         ignore_list = set(itertools.product(self.score_col, self.label_col))
         return statistics._auto_detect(data=df, 
                                        num_col=num_col,
@@ -145,11 +139,12 @@ class Questionnaire(object):
             return outlier
     
     def diff_item(self, col, transformed=True):
-        if col not in self._cached['data'].columns:
-            self.label()
+        df = self.data
+        if col not in df.columns:
+            df = self.processed
         
         if transformed:
-            df = self._cached['data'].copy()
+            df = df.copy()
             df[self.item_col] = self.transform()
         
         else:
@@ -157,26 +152,27 @@ class Questionnaire(object):
 
         return statistics._diff_group(df, group_col=col, num_col=self.item_col)
     
+    def corr_item(self, col, transformed=True):
+        return self.scored.corr()
+    
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
-        self.label()
-        return pd.crosstab(self._cached["data"][index], self._cached["data"][col])
+        return pd.crosstab(self.processed[index], self.processed[col])
     
     def t_test_group(self, item, info_col, **kwargs):
-        df = self._cached['data']
+        df = self.data
         if info_col not in self._cached['data'].columns:
-            self.label()
-            df = self._cached['data']
+            df = self.processed
         return statistics._t_test_group(data=df, group_col=info_col, num_col=item, **kwargs)
     
-    def t_test(self, num_col, group_col, group_1, group_2, **kwargs):
-        self.label()
-        df = self._cached['data']
-        return statistics._t_test(df, num_col, group_col, group_1, group_2, **kwargs)
+    def t_test(self, num_col, group_col, min_sample=20, **kwargs):
+        df = self.processed
+        groups_1, ignored_1 = statistics._filter_sparse_group(df, col_1, min_sample)
+        groups_2, ignored_2 = statistics._filter_sparse_group(df, col_2, min_sample)
+        return statistics._t_test(df, num_col, group_col, groups_1, groups_2, **kwargs)
         
     def chi_squared_dependence(self, col_1, col_2, min_sample=None):
-        self.label()
-        df = self._cached['data']
+        df = self.processed
 
         if min_sample is None:
             group_1 = df[col_1].value_counts().index
@@ -187,6 +183,9 @@ class Questionnaire(object):
             group_2, _ = statistics._filter_sparse_group(df, col_2, min_sample)
 
         return statistics._chi_squared_dependence(df, col_1, col_2, group_1, group_2)
+    
+    def scatter_item(self, **kwargs):
+        sns.pairplot(data=self.processed, vars=self.item_col, kind='scatter', **kwargs)
 
     def cluster(self, scoring):
         # Use KMeans clustering to cluster the response to something
@@ -231,6 +230,26 @@ class Questionnaire(object):
             self.transform()
             return self._cached['transform'].columns
     
+    @property
+    def transformed(self):
+        self.transform()
+        return self._cached['transform']
+    
+    @property
+    def scored(self):
+        self.score()
+        return self._cached['score']
+    
+    @property
+    def labeled(self):
+        self.label()
+        return self._cached['label']
+    
+    @property
+    def processed(self):
+        self.label()
+        return self._cached['data']
+    
     def __getitem__(self, col):
         try:
             return self._cached['data'][col]
@@ -238,5 +257,3 @@ class Questionnaire(object):
         except KeyError:
             self.label()
             return self._cached['data'][col]
-
-    
