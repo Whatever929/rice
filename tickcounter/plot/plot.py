@@ -19,6 +19,7 @@ def plot_each_col(data,
                   n_col=2, 
                   x=None,
                   rotate=False,
+                  suffix="Distribution of",
                   **kwargs):
   '''
   Plot a subplot of specified type on each selected column. 
@@ -57,7 +58,7 @@ def plot_each_col(data,
     if rotate:
       _rotate_label(ax, axis='x', rotation=90)
 
-    ax.set_title(f"Distribution of {col}")
+    ax.set_title(f"{suffix} {col}")
 
 def _rotate_label(ax, axis, rotation, **kwargs):
   if axis == 'x':
