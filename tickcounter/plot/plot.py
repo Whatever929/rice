@@ -41,7 +41,7 @@ def plot_each_col(data,
     ax = plt.subplot(n_row, n_col, i + 1)
     # TODO: Give options for horizontal orient
     order = None
-    if reorder is not None and descrip is not None:
+    if reorder and descrip is not None:
       try:
         order = descrip.get_order(col)
       

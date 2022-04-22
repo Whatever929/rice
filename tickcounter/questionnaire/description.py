@@ -57,6 +57,7 @@ class Description(object):
     # Sort according to the orders, only for description values
     mapping = {v:k for k,v in self[column]['values'].items()}
     ordered = sorted(values, key=lambda i: mapping[i])
+    return ordered
 
   def __getitem__(self, item):
     return self.descrip[item]

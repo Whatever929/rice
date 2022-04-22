@@ -21,7 +21,7 @@ class TestEncoder(unittest.TestCase):
             "Disagree": 2,
             "Strong Disagree": 1
         }, neutral=3, default=3, name="Agreeness", dtype=int)
-        cls.encoder_2 = Encoder(template=TestEncoder.encoder_1, inverse=True, dtype=int)
+        cls.encoder_2 = Encoder(template=TestEncoder.encoder_1, inverted=True, dtype=int)
         cls.encoder_3 = Encoder(encoding=TestEncoder.encoder_1.encoding, neutral=3, dtype=int)
 
     def setUp(self):
@@ -99,11 +99,11 @@ class TestEncoder(unittest.TestCase):
         # Test when mode and return_rule are used together.
         pass
     
-    def test_inverse(self):
+    def test_inverted(self):
         # TODO: Might need to rewrite this test
-        TestEncoder.encoder_1.inverse()
+        TestEncoder.encoder_1.inverted()
         result_1 = TestEncoder.encoder_1.transform(self.df)
-        TestEncoder.encoder_1.inverse()
+        TestEncoder.encoder_1.inverted()
         result_2 = TestEncoder.encoder_1.transform(self.df)
         assert_frame_equal(self.df, TestEncoder.original)
 
