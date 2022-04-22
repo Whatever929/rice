@@ -20,6 +20,9 @@ def plot_each_col(data,
                   x=None,
                   rotate=False,
                   suffix="Distribution of",
+                  reorder=True,
+                  descrip=None,
+                  descrip_value=True,
                   **kwargs):
   '''
   Plot a subplot of specified type on each selected column. 
@@ -37,6 +40,7 @@ def plot_each_col(data,
   n_row = math.ceil(len(col_list) / n_col)
   for i, col in enumerate(col_list):
     ax = plt.subplot(n_row, n_col, i + 1)
+    # TODO: Give options for horizontal orient
     if plot_type == "hist":
       sns.histplot(data=data, x=col, multiple="stack", **kwargs)
     
@@ -58,7 +62,19 @@ def plot_each_col(data,
     if rotate:
       _rotate_label(ax, axis='x', rotation=90)
 
-    ax.set_title(f"{suffix} {col}")
+    if descrip is None:
+      ax.set_title(f"{suffix} {col}")
+    
+    else:
+      try:
+        ax.set_title(f"{descrip[col]['description']}")
+        if descrip_value:
+          translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
+          ax.set_xticklabels(translated)
+      
+      except KeyError as e:
+        ax.set_title(f"{suffix} {col}")
+    
 
 def _rotate_label(ax, axis, rotation, **kwargs):
   if axis == 'x':

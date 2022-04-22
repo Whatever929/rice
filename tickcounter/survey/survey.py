@@ -1,4 +1,5 @@
 import numpy as np
+import seaborn as sns
 from ..util import plot_each_col
 from tickcounter import statistics, plot
 
@@ -83,8 +84,19 @@ class Survey(object):
         else:
             return outlier
     
+    def scatter_num(self, **kwargs):
+        return sns.pairplot(data=self.data, vars=self.num_col, kind='scatter', **kwargs)
+    
+    def crosstab(self, index, col):
+        # Should be a label paired with an info columns
+        return pd.crosstab(self.data[index], self.data[col])
+    
     def _plot(self, columns, kind, **kwargs):
-        return plot.plot_each_col(data=self.data, col_list=columns, plot_type=kind, **kwargs)
+        return plot.plot_each_col(data=self.data, 
+                                  col_list=columns, 
+                                  plot_type=kind, 
+                                  descrip=self.description, 
+                                  **kwargs)
 
     def _handle_null(self, data, col):
         return data.dropna(subset=col)
