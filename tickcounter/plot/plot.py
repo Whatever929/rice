@@ -89,9 +89,14 @@ def plot_each_col(data,
           ax.set_title(f"{suffix} {col}")
           
         if descrip_value:
-          translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
-          ax.set_xticklabels(translated)
-      
+          if orient == 'vertical':
+            translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
+            ax.set_xticklabels(translated)
+          
+          elif orient == 'horizontal':
+            translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
+            ax.set_yticklabels(translated)
+
       except KeyError as e:
         ax.set_title(f"{suffix} {col}")
     
