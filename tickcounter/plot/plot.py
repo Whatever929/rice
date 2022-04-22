@@ -18,6 +18,7 @@ def plot_each_col(data,
                   plot_type, 
                   n_col=2, 
                   rotate=False,
+                  orient='vertical',
                   suffix="Distribution of",
                   reorder=False,
                   descrip=None,
@@ -47,21 +48,28 @@ def plot_each_col(data,
       
       except KeyError as e:
         pass
+      
+    if orient == 'vertical':
+      plot_orient = {'x': col}
+    elif orient == 'horizontal':
+      plot_orient = {'y': col}
+    else:
+      raise ValueError("orient argument can only be vertical or horizontal")
 
-    if plot_type == "hist":
-      sns.histplot(data=data, x=col, multiple="stack", **kwargs)
+    if plot_type == "hist": 
+      sns.histplot(data=data, multiple="stack", **plot_orient, **kwargs)
     
     elif plot_type == "bar":
-      sns.barplot(data=data, x=col, order=order, **kwargs)
+      sns.barplot(data=data, order=order, **plot_orient, **kwargs)
 
     elif plot_type == "count":
-      sns.countplot(data=data, x=col, order=order, **kwargs)
+      sns.countplot(data=data, order=order, **plot_orient, **kwargs)
 
     elif plot_type == "box":
-      sns.boxplot(data=data, x=col, **kwargs)
+      sns.boxplot(data=data, **plot_orient, **kwargs)
     
     elif plot_type == 'kde':
-      sns.kdeplot(data=data, x=col, **kwargs)
+      sns.kdeplot(data=data, **plot_orient, **kwargs)
 
     else:
       raise ValueError(f"Invalid plot_type argument: {plot_type}")
