@@ -6,6 +6,7 @@ import seaborn as sns
 import itertools
 
 from tickcounter import plot, statistics
+from tickcounter.config import *
 
 class Questionnaire(object):
     def __init__(self, data, scoring, descrip=None):
@@ -85,7 +86,7 @@ class Questionnaire(object):
         df = self.processed_transformed if transformed else self.processed
         plot.plot_each_col(df, col_list = columns, plot_type=kind, **kwargs)
     
-    def auto_detect(self, group_col, num_col=None, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
+    def auto_detect(self, group_col, num_col=None, cohen_es=COHEN_ES, eta=ETA, phi_es=PHI_ES, p_value=P_VALUE, min_sample=MIN_SAMPLE):
         group_col = [group_col] if type(group_col) == str else group_col
         group_col.extend(self.label_col)
         if num_col is not None:

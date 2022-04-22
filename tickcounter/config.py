@@ -1,0 +1,5 @@
+ETA =  0.1
+COHEN_ES =  .2
+MIN_SAMPLE = 20
+PHI_ES = 0.2
+P_VALUE = 0.05

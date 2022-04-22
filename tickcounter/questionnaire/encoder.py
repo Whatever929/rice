@@ -5,7 +5,7 @@ from ..util import generate_name
 class Encoder(object):
     name_generator = generate_name("encoder")
 
-    def __init__(self, encoding=None, *, template=None, inverted=False, default=None, neutral=None, dtype=None, name=None):
+    def __init__(self, encoding=None, *, template=None, invert=False, default=None, neutral=None, dtype=None, name=None):
         if encoding is not None:
             self.encoding = encoding
             self.target = self.encoding.keys()
@@ -28,8 +28,8 @@ class Encoder(object):
         else:
             raise ValueError("Expected argument 'encoding'")
 
-        if inverted:
-            self.inverted()
+        if invert:
+            self.invert()
         
         # TODO: If template is used, we can use other name instead.
         if name is None:
@@ -38,7 +38,7 @@ class Encoder(object):
         else:
             self.name = name
     
-    def inverted(self):
+    def invert(self):
         encode_item = sorted(self.encoding.items(), key=lambda x:x[1], reverse=True)
         target = [i for i, j in encode_item]
         values = [j for i, j in encode_item]

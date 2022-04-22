@@ -2,6 +2,7 @@ import numpy as np
 import seaborn as sns
 from ..util import plot_each_col
 from tickcounter import statistics, plot
+from tickcounter.config import *
 
 import itertools
 
@@ -12,7 +13,7 @@ class Survey(object):
         self.cat_col = cat_col
         self.description = description
 
-    def auto_detect(self, cohen_es=0.2, eta=0.06, phi_es=0.2, p_value=0.05, min_sample=20):
+    def auto_detect(self, cohen_es=COHEN_ES, eta=ETA, phi_es=PHI_ES, p_value=P_VALUE, min_sample=MIN_SAMPLE):
         return statistics._auto_detect(data=self.data, 
                                        num_col=self.num_col, 
                                        cat_col=self.cat_col,
@@ -28,7 +29,7 @@ class Survey(object):
     def compute_eta_squared(self, *args):
         return statistics._compute_eta_squared(self, *args)
     
-    def compare_mean(self, num_col, group_col, *, cohen_es=0.2, eta=0.06, p_value=0.05, min_sample=20):
+    def compare_mean(self, num_col, group_col, *, cohen_es=COHEN_ES, eta=ETA, p_value=P_VALUE, min_sample=MIN_SAMPLE):
         return statistics._compare_mean(self.data, 
                                         num_col, 
                                         group_col, 
@@ -37,7 +38,7 @@ class Survey(object):
                                         p_value=p_value,
                                         min_sample=min_sample)
 
-    def compare_group(self, col_1, col_2, p_value=0.05, phi_es=0.2, min_sample=20):
+    def compare_group(self, col_1, col_2, p_value=P_VALUE, phi_es=PHI_ES, min_sample=MIN_SAMPLE):
         return statistics._compare_group(data=self.data,
                                          col_1=col_1,
                                          col_2=col_2, 

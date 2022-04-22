@@ -27,7 +27,7 @@ class TestScoring(unittest.TestCase):
                     5.0: 1,
                     }
         cls.e1 = Encoder(TestScoring.scale_a, default=3, neutral=3, name='Agree-ness')
-        cls.e2 = Encoder(template=TestScoring.e1, inverse=True, name='Disagree-ness')
+        cls.e2 = Encoder(template=TestScoring.e1, invert=True, name='Disagree-ness')
         cls.low = [10, 30]
         cls.high = [31, 100]
         cls.l1 = IntervalLabel({'Low': TestScoring.low, 'High': TestScoring.high})
