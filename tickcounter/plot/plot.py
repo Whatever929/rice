@@ -17,12 +17,12 @@ def plot_each_col(data,
                   col_list, 
                   plot_type, 
                   n_col=2, 
-                  x=None,
                   rotate=False,
                   suffix="Distribution of",
-                  reorder=True,
+                  reorder=False,
                   descrip=None,
-                  descrip_value=True,
+                  descrip_value=False,
+                  descrip_title=True,
                   **kwargs):
   '''
   Plot a subplot of specified type on each selected column. 
@@ -32,7 +32,6 @@ def plot_each_col(data,
   col_list: The columns to be plotted.
   n_col: Number of subplots on each row.
   plot_type: Graph type.
-  x: The column for x-axis, used for graphs type like line and trend graph.
   '''
   if len(col_list) < n_col:
     n_col = len(col_list)
@@ -41,14 +40,22 @@ def plot_each_col(data,
   for i, col in enumerate(col_list):
     ax = plt.subplot(n_row, n_col, i + 1)
     # TODO: Give options for horizontal orient
+    order = None
+    if reorder is not None and descrip is not None:
+      try:
+        order = descrip.get_order(col)
+      
+      except KeyError as e:
+        pass
+
     if plot_type == "hist":
       sns.histplot(data=data, x=col, multiple="stack", **kwargs)
     
     elif plot_type == "bar":
-      sns.barplot(data=data, x=col, **kwargs)
+      sns.barplot(data=data, x=col, order=order, **kwargs)
 
     elif plot_type == "count":
-      sns.countplot(data=data, x=col, **kwargs)
+      sns.countplot(data=data, x=col, order=order, **kwargs)
 
     elif plot_type == "box":
       sns.boxplot(data=data, x=col, **kwargs)
@@ -67,7 +74,12 @@ def plot_each_col(data,
     
     else:
       try:
-        ax.set_title(f"{descrip[col]['description']}")
+        if descrip_title:
+          ax.set_title(f"{descrip[col]['description']}")
+        
+        else:
+          ax.set_title(f"{suffix} {col}")
+          
         if descrip_value:
           translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
           ax.set_xticklabels(translated)
