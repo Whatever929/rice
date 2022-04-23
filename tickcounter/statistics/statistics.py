@@ -104,11 +104,11 @@ def _compare_mean(data, num_col, group_col, *, cohen_es=0.2, eta=0.06, p_value=0
         test_result, effect_size = _anova(data, num_col, group_col, groups)
         if test_result.pvalue <= p_value and effect_size >= eta:
             return AnovaFindings(data=data,
-                                    group_col=group_col,
-                                    groups=groups,
-                                    num_col=num_col,
-                                    test_result=test_result
-                                    )
+                                 group_col=group_col,
+                                 groups=groups,
+                                 num_col=num_col,
+                                 test_result=test_result
+                                 )
     
     return None
 

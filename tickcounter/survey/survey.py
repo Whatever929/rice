@@ -14,7 +14,7 @@ class Survey(object):
         self.description = description
 
     def auto_detect(self, cohen_es=COHEN_ES, eta=ETA, phi_es=PHI_ES, p_value=P_VALUE, min_sample=MIN_SAMPLE):
-        return statistics._auto_detect(data=self.data, 
+        findings_list = statistics._auto_detect(data=self.data, 
                                        num_col=self.num_col, 
                                        cat_col=self.cat_col,
                                        cohen_es=cohen_es,
@@ -22,6 +22,8 @@ class Survey(object):
                                        phi_es=phi_es,
                                        p_value=p_value,
                                        min_sample=min_sample)
+        findings_list.set_descrip(self.description)
+        return findings_list
     
     def anova(self, num_col, group_col):
         return statistics._anova(self.data, num_col, group_col)

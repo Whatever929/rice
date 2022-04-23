@@ -1,6 +1,7 @@
 from pathlib import Path
 import yaml
 import json
+import warnings
 
 class Description(object):
   def __init__(self, descrip):
@@ -47,6 +48,41 @@ class Description(object):
       result[i] = mapping[result[i]]
     return result
   
+  def _descrip_value(self, ax, col, axis='x'):
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
+      if axis == 'x':
+        translated = self.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
+        ax.set_xticklabels(translated)
+      
+      elif axis == 'y':
+        translated = self.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
+        ax.set_yticklabels(translated)
+      
+      else:
+        raise ValueError("col argument can only be 'x' or 'y'")
+      
+      return ax
+  
+  def _descrip_title(self, ax, col):
+    ax.set_title(f"{self[col]['description']}")
+    return ax
+  
+  def _descrip_transform(self, ax, col, descrip_value=False, descrip_title=False, value_axis='x'):
+    try:
+      if descrip_title:
+        self._descrip_title(ax=ax, col=col)
+    except KeyError as e:
+      pass
+
+    try:
+      if descrip_value:
+        self._descrip_value(ax=ax, col=col, axis=value_axis)
+    except KeyError as e:
+      pass
+
+    return ax
+
   def get_order(self, column):
     # Get the order of a column values
     mapping = {v:k for k, v in self[column]['values'].items()}

@@ -41,7 +41,6 @@ def plot_each_col(data,
   n_row = math.ceil(len(col_list) / n_col)
   for i, col in enumerate(col_list):
     ax = plt.subplot(n_row, n_col, i + 1)
-    # TODO: Give options for horizontal orient
     order = None
     if reorder and descrip is not None:
       try:
@@ -58,7 +57,7 @@ def plot_each_col(data,
       raise ValueError("orient argument can only be vertical or horizontal")
 
     if plot_type == "hist": 
-      sns.histplot(data=data, multiple="stack", **plot_orient, **kwargs)
+      sns.histplot(data=data, **plot_orient, **kwargs)
     
     elif plot_type == "bar":
       sns.barplot(data=data, order=order, **plot_orient, **kwargs)
@@ -84,25 +83,20 @@ def plot_each_col(data,
     else:
       try:
         if descrip_title:
-          ax.set_title(f"{descrip[col]['description']}")
+          descrip._descrip_title(ax=ax, col=col)
         
         else:
           ax.set_title(f"{suffix} {col}")
           
         if descrip_value:
-          with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            if orient == 'vertical':
-              translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
-              ax.set_xticklabels(translated)
-            
-            elif orient == 'horizontal':
-              translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
-              ax.set_yticklabels(translated)
+          if orient == 'vertical':
+            descrip._descrip_value(ax=ax, col=col, axis='x')
+          
+          elif orient == 'horizontal':
+            descrip._descrip_value(ax=ax, col=col, axis='y')
 
       except KeyError as e:
         ax.set_title(f"{suffix} {col}")
-    
 
 def _rotate_label(ax, axis, rotation, **kwargs):
   with warnings.catch_warnings():

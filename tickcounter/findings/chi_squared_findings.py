@@ -1,14 +1,16 @@
 from .findings import Findings
+from tickcounter import plot
 import seaborn as sns
 import numpy as np
 
 class ChiSquaredFindings(Findings):
     # Either report equal proportion (col_2 is None) or dependent relationship (col_2 is not None)
-    def __init__(self, data, col, groups, test_result):
+    def __init__(self, data, col, groups, test_result, descrip=None):
         self.data = data
         self.col = col
         self.groups = groups
         self.test_result = test_result
+        self.descrip = descrip
     
     def describe(self):
         if self.test_result.expected is None:
