@@ -2,6 +2,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 
 import math
+import warnings
 
 def plotter(f):
   def plotter_function(*args, figsize=(12, 12), title=None, y=1.05, tight_layout=True, **kwargs):
@@ -89,27 +90,31 @@ def plot_each_col(data,
           ax.set_title(f"{suffix} {col}")
           
         if descrip_value:
-          if orient == 'vertical':
-            translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
-            ax.set_xticklabels(translated)
-          
-          elif orient == 'horizontal':
-            translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
-            ax.set_yticklabels(translated)
+          with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            if orient == 'vertical':
+              translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
+              ax.set_xticklabels(translated)
+            
+            elif orient == 'horizontal':
+              translated = descrip.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
+              ax.set_yticklabels(translated)
 
       except KeyError as e:
         ax.set_title(f"{suffix} {col}")
     
 
 def _rotate_label(ax, axis, rotation, **kwargs):
-  if axis == 'x':
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, **kwargs)
-  
-  elif axis == 'y':
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, **kwargs)
-  
-  else:
-    raise ValueError("axis must be either 'x' or 'y'")
+  with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    if axis == 'x':
+      ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, **kwargs)
+    
+    elif axis == 'y':
+      ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, **kwargs)
+    
+    else:
+      raise ValueError("axis must be either 'x' or 'y'")
 
 def _create_moving_average(data, average=7, min_periods=1):
   return data.rolling(average, min_periods=min_periods).mean()
