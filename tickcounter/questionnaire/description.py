@@ -27,8 +27,9 @@ class Description(object):
   
   def translate(self, column, values):
     # Can be two ways, will use heuristics to decide the mapping
+    # TODO: Do we really want to use heuristics like this?
     mapping = self[column]['values']
-    if values[0] in mapping.keys() and values[1] in mapping.keys():
+    if values[0] in mapping.keys():
       return self._num_to_descrip(column, values)
 
     else:
@@ -67,8 +68,15 @@ class Description(object):
   def _descrip_title(self, ax, col):
     ax.set_title(f"{self[col]['description']}")
     return ax
+
+  def _descrip_legend(self, ax):
+    col = ax.get_legend().get_title().get_text()
+    for i in ax.get_legend().get_texts():
+        # TODO: Fix this, let the translate method can also take single value
+        i.set_text(self.translate(col, [int(i.get_text())])[0])
+    return ax
   
-  def _descrip_transform(self, ax, col, descrip_value=False, descrip_title=False, value_axis='x'):
+  def _descrip_transform(self, ax, col, descrip_value=False, descrip_title=False, descrip_legend=False, value_axis='x'):
     try:
       if descrip_title:
         self._descrip_title(ax=ax, col=col)
@@ -78,6 +86,12 @@ class Description(object):
     try:
       if descrip_value:
         self._descrip_value(ax=ax, col=col, axis=value_axis)
+    except KeyError as e:
+      pass
+
+    try:
+      if ax.get_legend() is not None and descrip_legend:
+        self._descrip_legend(ax)
     except KeyError as e:
       pass
 

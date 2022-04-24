@@ -20,11 +20,11 @@ class FindingsList(object):
         return descrip_ss
 
     @plot.plotter
-    def illustrate(self, n_col=1, descrip_value=False, descrip_title=False):
+    def illustrate(self, n_col=1, descrip_value=False, descrip_title=False, descrip_legend=False):
         for i, findings in enumerate(self.findings_list):
             ax = plt.subplot(len(self.findings_list), n_col, i + 1)
             ax.set_title(findings.describe_short())
-            findings.illustrate(ax=ax, descrip_value=descrip_value, descrip_title=descrip_title)
+            findings.illustrate(ax=ax, descrip_value=descrip_value, descrip_title=descrip_title, descrip_legend=descrip_legend)
     
     def set_descrip(self, descrip):
         for i in self.findings_list:

@@ -24,7 +24,7 @@ class DependenceFindings(Findings):
     def describe_short(self):
         return f"{self.col_1} and {self.col_2} are not independent"
     
-    def illustrate(self, ax=None, descrip_title=False, descrip_value=False, **kwargs):
+    def illustrate(self, ax=None, descrip_title=False, descrip_value=False, descrip_legend=False, **kwargs):
         data = allow_values(self.data, self.col_1, self.groups_1)
         data = allow_values(data, self.col_2, self.groups_2)
         if ax is None:
@@ -37,6 +37,6 @@ class DependenceFindings(Findings):
         self.descrip._descrip_transform(ax=ax, 
                                 col=self.col_1, 
                                 descrip_value=descrip_value,
-                                descrip_title=descrip_title)
+                                descrip_title=descrip_title,
+                                descrip_legend=descrip_legend)
         return ax
-        #TODO: Transform the legend too

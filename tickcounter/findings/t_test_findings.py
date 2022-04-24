@@ -27,7 +27,7 @@ class TTestFindings(Findings):
     def describe_short(self):
         return f"Values in {self.num_col} between groups in {self.group_col} are not independent"
     
-    def illustrate(self, ax=None, descrip_title=False, descrip_value=False, **kwargs):
+    def illustrate(self, ax=None, descrip_title=False, descrip_value=False, descrip_legend=False, **kwargs):
         #TODO: Support horizontal orient
         data = allow_values(self.data, self.group_col, [self.group_1, self.group_2])
         if ax is None:
@@ -41,6 +41,7 @@ class TTestFindings(Findings):
         self.descrip._descrip_transform(ax=ax, 
                                 col=self.group_col, 
                                 descrip_value=descrip_value,
-                                descrip_title=descrip_title)
+                                descrip_title=descrip_title,
+                                descrip_legend=descrip_legend)
 
         return ax

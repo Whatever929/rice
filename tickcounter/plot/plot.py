@@ -24,7 +24,8 @@ def plot_each_col(data,
                   reorder=False,
                   descrip=None,
                   descrip_value=False,
-                  descrip_title=True,
+                  descrip_title=False,
+                  descrip_legend=False,
                   **kwargs):
   '''
   Plot a subplot of specified type on each selected column. 
@@ -81,22 +82,34 @@ def plot_each_col(data,
       ax.set_title(f"{suffix} {col}")
     
     else:
+      # TODO: Do we need to do like this? Or we can include try except in the method?
       try:
         if descrip_title:
           descrip._descrip_title(ax=ax, col=col)
         
         else:
           ax.set_title(f"{suffix} {col}")
-          
+      
+      except KeyError as e:
+        ax.set_title(f"{suffix} {col}")
+
+      try:
         if descrip_value:
           if orient == 'vertical':
             descrip._descrip_value(ax=ax, col=col, axis='x')
           
           elif orient == 'horizontal':
             descrip._descrip_value(ax=ax, col=col, axis='y')
+      except KeyError as e:
+        pass
+
+      try:
+        if descrip_legend:
+          descrip._descrip_legend(ax=ax)
 
       except KeyError as e:
-        ax.set_title(f"{suffix} {col}")
+        pass
+      
 
 def _rotate_label(ax, axis, rotation, **kwargs):
   with warnings.catch_warnings():
