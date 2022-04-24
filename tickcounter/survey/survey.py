@@ -15,13 +15,13 @@ class Survey(object):
 
     def auto_detect(self, cohen_es=COHEN_ES, eta=ETA, phi_es=PHI_ES, p_value=P_VALUE, min_sample=MIN_SAMPLE):
         findings_list = statistics._auto_detect(data=self.data, 
-                                       num_col=self.num_col, 
-                                       cat_col=self.cat_col,
-                                       cohen_es=cohen_es,
-                                       eta=eta,
-                                       phi_es=phi_es,
-                                       p_value=p_value,
-                                       min_sample=min_sample)
+                                                num_col=self.num_col, 
+                                                cat_col=self.cat_col,
+                                                cohen_es=cohen_es,
+                                                eta=eta,
+                                                phi_es=phi_es,
+                                                p_value=p_value,
+                                                min_sample=min_sample)
         findings_list.set_descrip(self.description)
         return findings_list
     
@@ -71,6 +71,9 @@ class Survey(object):
     def hist_num(self, **kwargs):
         return self._plot(columns=self.num_col, kind='hist', **kwargs)
     
+    def box_num(self, **kwargs):
+        return self._plot(columns=self.num_col, kind='box', **kwargs)
+    
     def count_cat(self, **kwargs):
         return self._plot(columns=self.cat_col, kind='count', **kwargs)
     
@@ -93,6 +96,9 @@ class Survey(object):
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
         return pd.crosstab(self.data[index], self.data[col])
+    
+    def drop(self, index):
+        self.data.drop(index, inplace=True)
     
     def _plot(self, columns, kind, **kwargs):
         return plot.plot_each_col(data=self.data, 

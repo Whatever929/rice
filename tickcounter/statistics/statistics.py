@@ -72,12 +72,12 @@ def _compare_group(data, col_1, col_2, p_value=0.05, phi_es=0.2, min_sample=20):
         test_result, effect_size = _chi_squared_dependence(data, col_1, col_2, groups_1, groups_2)
         if test_result.pvalue <= p_value and effect_size >= phi_es:
             return DependenceFindings(data=data,
-                                    col_1=col_1,
-                                    col_2=col_2,
-                                    groups_1=groups_1,
-                                    groups_2=groups_2,
-                                    test_result=test_result
-                                    )
+                                      col_1=col_1,
+                                      col_2=col_2,
+                                      groups_1=groups_1,
+                                      groups_2=groups_2,
+                                      test_result=test_result
+                                     )
     return None
 
 def _compare_mean(data, num_col, group_col, *, cohen_es=0.2, eta=0.06, p_value=0.05, min_sample=20):
