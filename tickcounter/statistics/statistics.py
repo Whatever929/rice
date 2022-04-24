@@ -33,7 +33,7 @@ def _t_test(data, num_col, group_col, group_1, group_2, **kwargs):
     return test_result, effect_size
 
 def _compute_cohen_es(sample_1, sample_2):
-    cohen_es = (sample_1.mean() - sample_2.mean()) / sample_1.std()
+    cohen_es = abs(sample_1.mean() - sample_2.mean()) / sample_1.std()
     return cohen_es
 
 def _compute_phi_es(chi2, n):
