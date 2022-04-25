@@ -177,21 +177,11 @@ class Questionnaire(object):
             df = self.processed
         return statistics._t_test_group(data=df, group_col=info_col, num_col=item, **kwargs)
     
-    def t_test(self, num_col, group_col, group_1, group_2, **kwargs):
+    def t_test(self, num_col, group_col, group_1=None, group_2=None, **kwargs):
         return statistics._t_test(self.processed, num_col, group_col, group_1, group_2, **kwargs)
         
-    def chi_squared_dependence(self, col_1, col_2, min_sample=None):
-        df = self.processed
-
-        if min_sample is None:
-            group_1 = df[col_1].value_counts().index
-            group_2 = df[col_2].value_counts().index
-        
-        else:
-            group_1, _ = statistics._filter_sparse_group(df, col_1, min_sample)
-            group_2, _ = statistics._filter_sparse_group(df, col_2, min_sample)
-
-        return statistics._chi_squared_dependence(df, col_1, col_2, group_1, group_2)
+    def chi_squared_dependence(self, col_1, col_2, groups_1=None, groups_2=None, min_sample=MIN_SAMPLE):
+        return statistics._chi_squared_dependence(self.processed, col_1, col_2, groups_1, groups_2, min_sample)
     
     def scatter_item(self, **kwargs):
         sns.pairplot(data=self.processed, vars=self.item_col, kind='scatter', **kwargs)
