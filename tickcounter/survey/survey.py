@@ -52,26 +52,12 @@ class Survey(object):
                                          min_sample=min_sample)
 
     def t_test(self, num_col, group_col, group_1=None, group_2=None, **kwargs):
-        if group_1 is None and group_2 is None:
-            groups = self.data[group_col].value_counts()
-            if len(groups) != 2:
-                raise ValueError(f"Column {group_col} has more than 2 groups")
-            else:
-                return statistics._t_test(data=self.data,
-                                          num_col=num_col,
-                                          group_col=group_col,
-                                          group_1=groups.index[0],
-                                          group_2=groups.index[1],
-                                          **kwargs)
-        elif group_1 is not None and group_2 is not None:
-            return statistics._t_test(data=self.data,
-                                      num_col=num_col,
-                                      group_col=group_col,
-                                      group_1=group_1,
-                                      group_2=group_2,
-                                      **kwargs)
-        else:
-            raise ValueError("Please specify both group_1 and group_2")
+        return statistics._t_test(data=self.data,
+                                  num_col=num_col,
+                                  group_col=group_col,
+                                  group_1=group_1,
+                                  group_2=group_2,
+                                  **kwargs)
     
     def compute_cohen_es(self, sample_1, sample_2):
         return statistics._compute_cohen_es(sample_1, sample_2)
@@ -83,13 +69,7 @@ class Survey(object):
         return statistics._chi_squared(self.data, col_1, expected)
     
     def chi_squared_dependence(self, col_1, col_2, groups_1=None, groups_2=None, min_sample=MIN_SAMPLE):
-        if groups_1 is None:
-            filtered, ignored = statistics._filter_sparse_group(self.data, col_1, min_sample)
-            groups_1 = filtered
-        if groups_2 is None:
-            filtered, ignored = statistics._filter_sparse_group(self.data, col_2, min_sample)
-            groups_2 = filtered
-        return statistics._chi_squared_dependence(self.data, col_1, col_2, groups_1, groups_2)
+        return statistics._chi_squared_dependence(self.data, col_1, col_2, groups_1, groups_2, min_sample)
 
     def hist_num(self, **kwargs):
         return self._plot(columns=self.num_col, kind='hist', **kwargs)

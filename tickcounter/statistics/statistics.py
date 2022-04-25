@@ -23,7 +23,17 @@ def _compute_eta_squared(*args):
     group_mean = np.array(group_mean)
     return group_mean.var() / all_data.var()
 
-def _t_test(data, num_col, group_col, group_1, group_2, **kwargs):
+def _t_test(data, num_col, group_col, group_1=None, group_2=None, **kwargs):
+    if group_1 is None and group_2 is None:
+        groups = data[group_col].value_counts()
+        if len(groups) != 2:
+            raise ValueError(f"Column {group_col} has more than 2 groups")
+        else:
+            group_1 = groups.index[0]
+            group_2 = groups.index[1]
+    elif not (group_1 is not None and group_2 is not None):
+        raise ValueError("Please specify both group_1 and group_2")
+
     first_sample = data[data[group_col] == group_1][num_col]
     second_sample = data[data[group_col] == group_2][num_col]
     test_result = ttest_ind(a = first_sample,
@@ -46,7 +56,17 @@ def _chi_squared(data, col_1, expected=None):
     effect_size = _compute_phi_es(test_result.chisq, len(data[col_1]))
     return test_result, effect_size
 
-def _chi_squared_dependence(data, col_1, col_2, groups_1, groups_2):
+def _chi_squared_dependence(data, col_1, col_2, groups_1, groups_2, min_sample):
+    if groups_1 is None:
+        filtered, ignored = _filter_sparse_group(data, col_1, min_sample)
+        if len(filtered) < 2:
+            raise ValueError(f"Only one group for {col_1}")
+        groups_1 = filtered
+    if groups_2 is None:
+        filtered, ignored = _filter_sparse_group(data, col_2, min_sample)
+        if len(filtered) < 2:
+            raise ValueError(f"Only one group for {col_2}")
+        groups_2 = filtered
     group_1 = data[col_1]
     group_1 = group_1[group_1.isin([groups_1]).index]
     group_2 = data[col_2]
@@ -69,7 +89,7 @@ def _compare_group(data, col_1, col_2, p_value=0.05, phi_es=0.2, min_sample=20):
         pass
     
     else:
-        test_result, effect_size = _chi_squared_dependence(data, col_1, col_2, groups_1, groups_2)
+        test_result, effect_size = _chi_squared_dependence(data, col_1, col_2, groups_1, groups_2, min_sample)
         if test_result.pvalue <= p_value and effect_size >= phi_es:
             return DependenceFindings(data=data,
                                       col_1=col_1,
