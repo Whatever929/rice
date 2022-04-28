@@ -1,0 +1,50 @@
+gender:
+  description: "Gender"
+  values:
+    0: "Male"
+    1: "Female"
+age:
+  description: "Age"
+  values:
+    0: "Below 20"
+    1: "From 20 to 29"
+    2: "From 30 to 39"
+    3: "40 and above"
+status:
+  description: "Are you currently....?"
+  values:
+    0: "Student"
+    1: "Self-employed"
+    2: "Employed"
+    3: "Housewife"
+income:
+  description: "What is your annual income?"
+  values:
+    0: "Less than RM25,000"
+    1: "RM25,000 - RM50,000"
+    2: "RM50,000 - RM100,000"
+    3: "RM100,000 - RM150,000"
+    4: "More than RM150,000"
+visitNo:
+  description: "How often do you visit Starbucks?"
+  values:
+    0: "Daily"
+    1: "Weekly"
+    2: "Monthly"
+    3: "Rarely"
+method:
+  description: "How do you usually enjoy Starbucks?"
+  values:
+    0: "Dine in"
+    1: "Drive-thru"
+    2: "Take away"
+    5: "Never"
+membershipCard:
+  description: "Do you have Starbucks membership card?"
+  values:
+    0: "No"
+    1: "Yes"
+serviceRate:
+  description: "How would you rate the service at Starbucks?"
+priceRate:
+  description: "How would you rate the price range at Starbucks?"
