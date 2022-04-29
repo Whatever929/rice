@@ -27,26 +27,36 @@ class Description(object):
   
   def translate(self, column, values):
     # Can be two ways, will use heuristics to decide the mapping
-    # TODO: Do we really want to use heuristics like this?
+    # TODO: Do we really want to use heuristics like this? Also there is duplicate checking already
     mapping = self[column]['values']
-    if values[0] in mapping.keys():
-      return self._num_to_descrip(column, values)
+    try:
+      if values[0] in mapping.keys():
+        return self._num_to_descrip(column, values)
+    
+    except TypeError as e:
+      if values in mapping.keys():
+        return self._num_to_descrip(column, values)
 
     else:
       return self._descrip_to_num(column, values)
   
   def _num_to_descrip(self, column, values):
     mapping = self[column]['values']
-    result = values.copy()
-    for i in range(len(result)):
-      result[i] = mapping[result[i]]
-    return result
+    return self._translate(values, mapping)
   
   def _descrip_to_num(self, column, values):
     mapping = {v:k for k, v in self[column]['values'].items()}
-    result = values.copy()
-    for i in range(len(result)):
-      result[i] = mapping[result[i]]
+    return self._translate(values, mapping)
+  
+  def _translate(self, values, mapping):
+    # Either a list or just a single value
+    try:
+      result = values.copy()
+      for i in range(len(result)):
+        result[i] = mapping[result[i]]
+    except (AttributeError, KeyError) as e:
+      result = mapping[values]
+    
     return result
   
   def _descrip_value(self, ax, col, axis='x'):
@@ -69,11 +79,11 @@ class Description(object):
       
       return ax
   
-  def _descrip_title(self, ax, col):
+  def _descrip_title(self, ax, col, default=''):
     try:
       ax.set_title(f"{self[col]['description']}")
     except KeyError as e:
-      pass
+      ax.set_title(default)
     return ax
 
   def _descrip_legend(self, ax):
@@ -81,7 +91,7 @@ class Description(object):
     for i in ax.get_legend().get_texts():
         # TODO: Fix this, let the translate method can also take single value
         try:
-          i.set_text(self.translate(col, [int(i.get_text())])[0])
+          i.set_text(self.translate(col, int(i.get_text())))
         except KeyError as e:
           pass
     return ax

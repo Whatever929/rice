@@ -20,7 +20,7 @@ def plot_each_col(data,
                   n_col=2, 
                   rotate=False,
                   orient='vertical',
-                  suffix="Distribution of",
+                  suffix="Distribution of ",
                   reorder=False,
                   descrip=None,
                   descrip_value=False,
@@ -79,14 +79,14 @@ def plot_each_col(data,
       _rotate_label(ax, axis='x', rotation=90)
 
     if descrip is None:
-      ax.set_title(f"{suffix} {col}")
+      ax.set_title(f"{suffix}{col}")
     
     else:
       if descrip_title:
-        descrip._descrip_title(ax=ax, col=col)
+        descrip._descrip_title(ax=ax, col=col, default=f"{suffix}{col}")
         
       else:
-        ax.set_title(f"{suffix} {col}")
+        ax.set_title(f"{suffix}{col}")
 
       if descrip_value:
         if orient == 'vertical':
@@ -159,7 +159,7 @@ def _plot_trend(data, y, x=None, ax=None,
   return ax
 
 @plotter
-def compare_distro(data, 
+def compare_dist(data, 
                    feat_1, 
                    feat_2, 
                    n_col=2, 
@@ -168,6 +168,7 @@ def compare_distro(data,
                    suffix='', 
                    descrip=None, 
                    descrip_title=False,
+                   descrip_value=False,
                    **kwargs):
   # TODO: also add descrip_value
   groups = data[feat_1].value_counts()
@@ -180,14 +181,29 @@ def compare_distro(data,
     ax = plt.subplot(n_row, n_col, i + 1)
     ax.set_title(f"{suffix}{group}")
     data_group = data[data[feat_1] == group][feat_2]
-    _plot_pie(data_group, ax, **kwargs)
-    if descrip is not None and descrip_title:
-      descrip._descrip_title(ax, group)
+    payload = _plot_pie(data_group, ax, **kwargs)
+    
+    if len(payload) == 3:
+      patches, texts, autotexts = payload
+    else:
+      patches, texts = payload
+
+    if descrip is not None:
+      if descrip_title:
+        ax.set_title(descrip.translate(column=feat_1, values=int(ax.get_title())))
+    
+      if descrip_value:
+        for i in texts:
+          i.set_text(descrip.translate(column=feat_2, values=int(i.get_text())))
 
 def _plot_pie(data, ax, top=None, **kwargs):
   groups = data.value_counts()
-  ax.pie(groups.values, labels=groups.index, 
-         autopct="%.1f", **kwargs)
+  total = groups.sum()
+  def my_fmt(x):
+    # Source: https://stackoverflow.com/questions/59644751/matplotlib-pie-chart-show-both-value-and-percentage
+    return '{:.2f}%\n({:.0f})'.format(x, total*x/100)
+  return ax.pie(groups.values, labels=groups.index, 
+                autopct=my_fmt, **kwargs)
 
 #TODO: Make a function for each plot type
 #TODO: Migrate top plotting function, trend and line function to here

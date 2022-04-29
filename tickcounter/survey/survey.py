@@ -13,7 +13,7 @@ class Survey(object):
         self.data = data
         self.num_col = num_col
         self.cat_col = cat_col
-        self.description = description
+        self.descrip = description
 
     def auto_detect(self, cohen_es=COHEN_ES, eta=ETA, phi_es=PHI_ES, p_value=P_VALUE, min_sample=MIN_SAMPLE):
         findings_list = statistics._auto_detect(data=self.data, 
@@ -24,7 +24,7 @@ class Survey(object):
                                                 phi_es=phi_es,
                                                 p_value=p_value,
                                                 min_sample=min_sample)
-        findings_list.set_descrip(self.description)
+        findings_list.set_descrip(self.descrip)
         return findings_list
     
     def anova(self, num_col, group_col):
@@ -96,6 +96,9 @@ class Survey(object):
     def scatter_num(self, **kwargs):
         return sns.pairplot(data=self.data, vars=self.num_col, kind='scatter', **kwargs)
     
+    def compare_dist(self, feat_1, feat_2, **kwargs):
+        return plot.compare_dist(self.data, feat_1, feat_2, descrip=self.descrip, **kwargs)
+    
     def crosstab(self, index, col):
         # Should be a label paired with an info columns
         return pd.crosstab(self.data[index], self.data[col])
@@ -107,7 +110,7 @@ class Survey(object):
         return plot.plot_each_col(data=self.data, 
                                   col_list=columns, 
                                   plot_type=kind, 
-                                  descrip=self.description, 
+                                  descrip=self.descrip, 
                                   **kwargs)
 
     def _handle_null(self, data, col):

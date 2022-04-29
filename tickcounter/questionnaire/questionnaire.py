@@ -171,6 +171,13 @@ class Questionnaire(object):
         # Should be a label paired with an info columns
         return pd.crosstab(self.processed[index], self.processed[col])
     
+    def compare_dist(self, feat_1, feat_2, transformed=True, **kwargs):
+        if transformed:
+            return plot.compare_dist(self.processed_transformed, feat_1, feat_2, descrip=self.descrip, **kwargs)
+        
+        else:
+            return plot.compare_dist(self.processed, feat_1, feat_2, descrip=self.descrip, **kwargs)
+    
     def t_test_group(self, item, info_col, **kwargs):
         df = self.data
         if info_col not in self._cached['data'].columns:
