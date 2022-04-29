@@ -22,7 +22,7 @@ class DependenceFindings(Findings):
                f"{self.test_result.pvalue:.2f} (chi-squared)"
 
     def describe_short(self):
-        return f"{self.col_1} and {self.col_2} are not independent"
+        return f"{self.col_1} (cat) and {self.col_2} (cat) are not independent"
     
     def illustrate(self, ax=None, descrip_title=False, descrip_value=False, descrip_legend=False, **kwargs):
         data = allow_values(self.data, self.col_1, self.groups_1)

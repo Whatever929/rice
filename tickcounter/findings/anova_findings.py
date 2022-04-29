@@ -23,7 +23,7 @@ class AnovaFindings(Findings):
         return descrip
     
     def describe_short(self):
-        return f"Value of {self.num_col} between {self.groups} are not independent."
+        return f"{self.num_col} (num) and {self.group_col} (cat) are not independent."
 
     def illustrate(self, ax=None, descrip_title=False, descrip_value=False, descrip_legend=False, **kwargs):
         data = allow_values(self.data, self.group_col, self.groups)

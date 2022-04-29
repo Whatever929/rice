@@ -25,7 +25,7 @@ class TTestFindings(Findings):
                f"{group_2_val} ({group_2_mean:.2f}) with p_value of {self.test_result.pvalue:.2f}."
     
     def describe_short(self):
-        return f"Values in {self.num_col} between groups in {self.group_col} are not independent"
+        return f"{self.num_col} (num) and {self.group_col} (cat) are not independent"
     
     def illustrate(self, ax=None, descrip_title=False, descrip_value=False, descrip_legend=False, **kwargs):
         #TODO: Support horizontal orient
