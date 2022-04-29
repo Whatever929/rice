@@ -5,12 +5,12 @@ import math
 import warnings
 
 def plotter(f):
-  def plotter_function(*args, figsize=(12, 12), title=None, y=1.05, tight_layout=True, **kwargs):
+  def plotter_function(*args, figsize=(12, 12), title=None, title_y=1.03, tight_layout=True, **kwargs):
     plt.figure(figsize=figsize, tight_layout=tight_layout)
     f(*args, **kwargs)
     figure = plt.gcf()
     if title is not None:
-      figure.suptitle(title, fontsize=16, y=y)
+      figure.suptitle(title, fontsize=16, y=title_y)
   return plotter_function
   
 @plotter
@@ -82,33 +82,21 @@ def plot_each_col(data,
       ax.set_title(f"{suffix} {col}")
     
     else:
-      # TODO: Do we need to do like this? Or we can include try except in the method?
-      try:
-        if descrip_title:
-          descrip._descrip_title(ax=ax, col=col)
+      if descrip_title:
+        descrip._descrip_title(ax=ax, col=col)
         
-        else:
-          ax.set_title(f"{suffix} {col}")
-      
-      except KeyError as e:
+      else:
         ax.set_title(f"{suffix} {col}")
 
-      try:
-        if descrip_value:
-          if orient == 'vertical':
-            descrip._descrip_value(ax=ax, col=col, axis='x')
-          
-          elif orient == 'horizontal':
-            descrip._descrip_value(ax=ax, col=col, axis='y')
-      except KeyError as e:
-        pass
+      if descrip_value:
+        if orient == 'vertical':
+          descrip._descrip_value(ax=ax, col=col, axis='x')
+        
+        elif orient == 'horizontal':
+          descrip._descrip_value(ax=ax, col=col, axis='y')
 
-      try:
-        if descrip_legend:
-          descrip._descrip_legend(ax=ax)
-
-      except KeyError as e:
-        pass
+      if descrip_legend:
+        descrip._descrip_legend(ax=ax)
       
 
 def _rotate_label(ax, axis, rotation, **kwargs):

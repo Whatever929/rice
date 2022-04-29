@@ -52,48 +52,49 @@ class Description(object):
   def _descrip_value(self, ax, col, axis='x'):
     with warnings.catch_warnings():
       warnings.simplefilter('ignore')
-      if axis == 'x':
-        translated = self.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
-        ax.set_xticklabels(translated)
+      try:
+        if axis == 'x':
+          translated = self.translate(col, [int(item.get_text()) for item in ax.get_xticklabels()])
+          ax.set_xticklabels(translated)
+        
+        elif axis == 'y':
+          translated = self.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
+          ax.set_yticklabels(translated)
+        
+        else:
+          raise ValueError("col argument can only be 'x' or 'y'")
       
-      elif axis == 'y':
-        translated = self.translate(col, [int(item.get_text()) for item in ax.get_yticklabels()])
-        ax.set_yticklabels(translated)
-      
-      else:
-        raise ValueError("col argument can only be 'x' or 'y'")
+      except KeyError as e:
+        pass
       
       return ax
   
   def _descrip_title(self, ax, col):
-    ax.set_title(f"{self[col]['description']}")
+    try:
+      ax.set_title(f"{self[col]['description']}")
+    except KeyError as e:
+      pass
     return ax
 
   def _descrip_legend(self, ax):
     col = ax.get_legend().get_title().get_text()
     for i in ax.get_legend().get_texts():
         # TODO: Fix this, let the translate method can also take single value
-        i.set_text(self.translate(col, [int(i.get_text())])[0])
+        try:
+          i.set_text(self.translate(col, [int(i.get_text())])[0])
+        except KeyError as e:
+          pass
     return ax
   
   def _descrip_transform(self, ax, col, descrip_value=False, descrip_title=False, descrip_legend=False, value_axis='x'):
-    try:
-      if descrip_title:
-        self._descrip_title(ax=ax, col=col)
-    except KeyError as e:
-      pass
+    if descrip_title:
+      self._descrip_title(ax=ax, col=col)
 
-    try:
-      if descrip_value:
-        self._descrip_value(ax=ax, col=col, axis=value_axis)
-    except KeyError as e:
-      pass
+    if descrip_value:
+      self._descrip_value(ax=ax, col=col, axis=value_axis)
 
-    try:
-      if ax.get_legend() is not None and descrip_legend:
-        self._descrip_legend(ax)
-    except KeyError as e:
-      pass
+    if ax.get_legend() is not None and descrip_legend:
+      self._descrip_legend(ax)
 
     return ax
 
