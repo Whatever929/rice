@@ -27,7 +27,7 @@ class Questionnaire(object):
 
         else:
             data = None
-            # Will change this to support MultiEncoder in the future.
+            # TODO: Will change this to support MultiEncoder in the future.
             for i in self.scoring:
                 cur_data = i.transform(self.data[i.columns])
                 if data is None:

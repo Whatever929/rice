@@ -28,7 +28,12 @@ class Description(object):
   def translate(self, column, values):
     # Can be two ways, will use heuristics to decide the mapping
     # TODO: Do we really want to use heuristics like this? Also there is duplicate checking already
-    mapping = self[column]['values']
+    try:
+      mapping = self[column]['values']
+    except KeyError as e:
+      # If the column is not in the description, return the original values.
+      return values
+
     try:
       if values[0] in mapping.keys():
         return self._num_to_descrip(column, values)
@@ -55,6 +60,7 @@ class Description(object):
       for i in range(len(result)):
         result[i] = mapping[result[i]]
     except (AttributeError, KeyError) as e:
+      # If values is not a list
       result = mapping[values]
     
     return result

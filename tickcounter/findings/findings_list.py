@@ -16,7 +16,7 @@ class FindingsList(object):
         return descrip_ss
     
     def describe_short(self):
-        descrip_ss = pd.Series([i.describe_short(descrip_value=descrip_value) for i in self.findings_list])
+        descrip_ss = pd.Series([i.describe_short() for i in self.findings_list])
         return descrip_ss
 
     @plot.plotter
