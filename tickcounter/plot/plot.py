@@ -170,5 +170,36 @@ def _plot_trend(data, y, x=None, ax=None,
 
   return ax
 
+@plotter
+def compare_distro(data, 
+                   feat_1, 
+                   feat_2, 
+                   n_col=2, 
+                   figsize=(8, 8), 
+                   kind='pie', 
+                   suffix='', 
+                   descrip=None, 
+                   descrip_title=False,
+                   **kwargs):
+  # TODO: also add descrip_value
+  groups = data[feat_1].value_counts()
+
+  if len(groups) < n_col:
+    n_col = len(groups)
+  n_row = math.ceil(len(groups) / n_col)
+
+  for i, group in enumerate(groups.index):
+    ax = plt.subplot(n_row, n_col, i + 1)
+    ax.set_title(f"{suffix}{group}")
+    data_group = data[data[feat_1] == group][feat_2]
+    _plot_pie(data_group, ax, **kwargs)
+    if descrip is not None and descrip_title:
+      descrip._descrip_title(ax, group)
+
+def _plot_pie(data, ax, top=None, **kwargs):
+  groups = data.value_counts()
+  ax.pie(groups.values, labels=groups.index, 
+         autopct="%.1f", **kwargs)
+
 #TODO: Make a function for each plot type
 #TODO: Migrate top plotting function, trend and line function to here
